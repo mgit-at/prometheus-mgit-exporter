@@ -1,0 +1,5 @@
+prometheus-mgit-exporter (1.0.0) stable; urgency=medium
+
+  * Initial release.
+
+ -- Christoph Hack <chack@mgit.at>  Fri, 10 Mar 2017 09:51:14 +0100

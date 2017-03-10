@@ -1,0 +1,10 @@
+{
+  "listen": ":9328",
+  "certfile": {
+    "enable": false,
+    "globs": [
+      "/etc/ssl/**/*.pem",
+      "/etc/ssl/**/*.crt"
+    ]
+  }
+}
