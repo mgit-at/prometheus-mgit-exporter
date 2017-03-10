@@ -6,5 +6,9 @@
       "/etc/ssl/**/*.pem",
       "/etc/ssl/**/*.crt"
     ]
+  },
+  "mcelog": {
+    "enable": false,
+    "path": "/var/log/mcelog"
   }
 }

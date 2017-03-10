@@ -23,6 +23,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		CertFileOptions
 	} `json:"certfile"`
+	MCELog struct {
+		Enable bool `json:"enable"`
+		MCELogOptions
+	} `json:"mcelog"`
 }
 
 func run() error {
@@ -51,6 +55,14 @@ func run() error {
 		c := NewCertFileChecker(cfg.CertFile.CertFileOptions)
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register certfile checker: %v", err)
+		}
+	}
+
+	if cfg.MCELog.Enable {
+		log.Println("enabling mcelog checker")
+		c := NewMCELogChecker(cfg.MCELog.MCELogOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register mcelog checker: %v", err)
 		}
 	}
 

@@ -14,6 +14,9 @@ checks are currently available:
 **certfile:** walks certain directories (like /etc/ssl, globbing configureable)
 and exports the "not after" field of all certificates found.
 
+**mcelog:** reports the size of the machine exception log (/var/log/mcelog)
+indicating hardware errors.
+
 Configuration
 -------------
 
@@ -27,6 +30,10 @@ This is an example configuration file with all checks enabled:
           "/etc/ssl/**/*.pem",
           "/etc/ssl/**/*.crt"
         ]
+      },
+      "mcelog": {
+        "enable": false,
+        "path": "/var/log/mcelog"
       }
     }
 
