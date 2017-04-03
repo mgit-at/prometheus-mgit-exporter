@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"strings"
 
 	zglob "github.com/mattn/go-zglob"
 	"github.com/pkg/errors"
@@ -16,7 +17,8 @@ import (
 )
 
 type CertFileOptions struct {
-	Globs []string `json:"globs"`
+	Globs         []string `json:"globs"`
+	ExcludeSystem bool     `json:"exclude_system"`
 }
 
 type CertFileChecker struct {
@@ -41,7 +43,6 @@ func (c *CertFileChecker) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (c *CertFileChecker) Collect(ch chan<- prometheus.Metric) {
-
 	for _, glob := range c.opts.Globs {
 		matches, err := zglob.Glob(glob)
 		if err != nil {
@@ -49,6 +50,9 @@ func (c *CertFileChecker) Collect(ch chan<- prometheus.Metric) {
 			continue
 		}
 		for _, m := range matches {
+			if c.opts.ExcludeSystem && strings.HasPrefix(m, "/etc/ssl/certs/") {
+				continue
+			}
 			if err := c.collectCert(m, ch); err != nil {
 				log.Printf("failed to check %q: %v", m, err)
 			}

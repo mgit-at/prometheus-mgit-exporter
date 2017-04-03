@@ -29,7 +29,8 @@ This is an example configuration file with all checks enabled:
         "globs": [
           "/etc/ssl/**/*.pem",
           "/etc/ssl/**/*.crt"
-        ]
+        ],
+        "exclude_system": true
       },
       "mcelog": {
         "enable": false,
