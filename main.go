@@ -27,6 +27,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		MCELogOptions
 	} `json:"mcelog"`
+	PTHeartbeat struct {
+		Enable bool `json:"enable"`
+		PTHeartbeatOptions
+	} `json:"ptheartbeat"`
 }
 
 func run() error {
@@ -63,6 +67,14 @@ func run() error {
 		c := NewMCELogChecker(cfg.MCELog.MCELogOptions)
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register mcelog checker: %v", err)
+		}
+	}
+
+	if cfg.PTHeartbeat.Enable {
+		log.Println("enabling ptheartbeat checker")
+		c := NewPTHeartbeatChecker(cfg.PTHeartbeat.PTHeartbeatOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register ptheartbeat checker: %v", err)
 		}
 	}
 

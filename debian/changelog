@@ -1,3 +1,9 @@
+prometheus-mgit-exporter (1.2.0) stable; urgency=medium
+
+  * ptheartbeat: new checker
+
+ -- Christoph Hack <chack@mgit.at>  Mon,  4 Dec 2017 13:16:00 +0100
+
 prometheus-mgit-exporter (1.1.1) stable; urgency=medium
 
   * certfile: added exclude_system option
