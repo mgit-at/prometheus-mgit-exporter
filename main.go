@@ -31,6 +31,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		PTHeartbeatOptions
 	} `json:"ptheartbeat"`
+	FsTab struct {
+		Enable bool `json:"enable"`
+		FsTabOptions
+	}
 }
 
 func run() error {
@@ -75,6 +79,14 @@ func run() error {
 		c := NewPTHeartbeatChecker(cfg.PTHeartbeat.PTHeartbeatOptions)
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register ptheartbeat checker: %v", err)
+		}
+	}
+
+	if cfg.FsTab.Enable {
+		log.Println("enabling fstab checker")
+		c := NewFsTabChecker(cfg.FsTab.FsTabOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register fstab checker: %v", err)
 		}
 	}
 
