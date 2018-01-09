@@ -34,7 +34,11 @@ type Config struct {
 	FsTab struct {
 		Enable bool `json:"enable"`
 		FsTabOptions
-	}
+	} `json:"fstab"`
+	BinLog struct {
+		Enable bool `json:"enable"`
+		MySQLBinOptions
+	} `json:"binlog"`
 }
 
 func run() error {
@@ -87,6 +91,14 @@ func run() error {
 		c := NewFsTabChecker(cfg.FsTab.FsTabOptions)
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register fstab checker: %v", err)
+		}
+	}
+
+	if cfg.BinLog.Enable {
+		log.Println("enabling binlog checker")
+		c := NewMySQLBinChecker(cfg.BinLog.MySQLBinOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register binlog checker: %v", err)
 		}
 	}
 

@@ -11,5 +11,8 @@
   "mcelog": {
     "enable": false,
     "path": "/var/log/mcelog"
+  },
+  "fstab": {
+    "enable": true
   }
 }
