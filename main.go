@@ -39,6 +39,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		MySQLBinOptions
 	} `json:"binlog"`
+	RasDaemon struct {
+		Enable bool `json:"enable"`
+		RasDaemonOptions
+	} `json:"rasdaemon"`
 }
 
 func run() error {
@@ -99,6 +103,14 @@ func run() error {
 		c := NewMySQLBinChecker(cfg.BinLog.MySQLBinOptions)
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register binlog checker: %v", err)
+		}
+	}
+
+	if cfg.RasDaemon.Enable {
+		log.Println("enabling rasdaemon checker")
+		c := NewRasdaemonChecker(cfg.RasDaemon.RasDaemonOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register rasdaemon checker: %v", err)
 		}
 	}
 
