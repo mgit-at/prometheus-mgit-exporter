@@ -43,6 +43,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		RasDaemonOptions
 	} `json:"rasdaemon"`
+	Elk struct {
+		Enable bool `json:"enable"`
+		ElkOptions
+	} `json:"elk"`
 }
 
 func run() error {
@@ -112,6 +116,15 @@ func run() error {
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register rasdaemon checker: %v", err)
 		}
+	}
+
+	if cfg.Elk.Enable {
+		log.Println("enabling elk checker")
+		c := NewElkChecker(cfg.Elk.ElkOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register elk checker: %v", err)
+		}
+
 	}
 
 	if cfg.Listen == "" {

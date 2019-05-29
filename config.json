@@ -17,5 +17,10 @@
   },
   "rasdaemon": {
     "enable": true
+  },
+  "elk": {
+    "enable": true,
+    "duration": "170h",
+    "node": "m3-hot"
   }
 }

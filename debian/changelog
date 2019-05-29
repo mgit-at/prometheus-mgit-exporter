@@ -1,3 +1,9 @@
+prometheus-mgit-exporter (1.5.0) stable; urgency=medium
+
+  * elk: added elk checker
+
+ -- Sabine Kozeschnik <skozeschnik@mgit.at>  Tue,  28 May 2019 16:01:00 +0100
+
 prometheus-mgit-exporter (1.4.0) stable; urgency=medium
 
   * rasdaemon: added rasdaemon checker
