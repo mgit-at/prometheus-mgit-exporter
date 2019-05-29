@@ -1,3 +1,9 @@
+prometheus-mgit-exporter (1.6.0) stable; urgency=medium
+
+  * certfile: support symlinks with glob pattern
+
+ -- Sabine Kozeschnik <skozeschnik@mgit.at>  Tue,  29 May 2019 10:51:00 +0100
+
 prometheus-mgit-exporter (1.5.0) stable; urgency=medium
 
   * elk: added elk checker

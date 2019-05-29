@@ -44,7 +44,7 @@ func (c *CertFileChecker) Describe(ch chan<- *prometheus.Desc) {
 
 func (c *CertFileChecker) Collect(ch chan<- prometheus.Metric) {
 	for _, glob := range c.opts.Globs {
-		matches, err := zglob.Glob(glob)
+		matches, err := zglob.GlobFollowSymlinks(glob)
 		if err != nil {
 			log.Printf("failed to glob %q: %v", glob, err)
 			continue
