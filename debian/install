@@ -1,4 +1,0 @@
-prometheus-mgit-exporter usr/bin/
-config.json etc/prometheus-mgit-exporter/
-README.md usr/share/doc/prometheus-mgit-exporter/
-LICENSE usr/share/doc/prometheus-mgit-exporter/

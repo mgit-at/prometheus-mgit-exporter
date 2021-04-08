@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_tool_library")
+
+go_tool_library(
+    name = "go_tool_library",
+    srcs = ["pass.go"],
+    importpath = "mgit.at/prometheus-mgit-exporter/bazel/nogofmt",
+    visibility = ["//visibility:public"],
+    deps = ["@org_golang_x_tools//go/analysis:go_tool_library"],
+)
+
+go_library(
+    name = "nogofmt",
+    srcs = ["pass.go"],
+    importpath = "mgit.at/prometheus-mgit-exporter/bazel/nogofmt",
+    visibility = ["//visibility:public"],
+    deps = ["@org_golang_x_tools//go/analysis"],
+)

@@ -1,0 +1,167 @@
+{
+  "asmdecl": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "assign": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "atomic": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "atomicalign": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "bools": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "buildssa": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "buildtag": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "composites": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "copylocks": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "ctrlflow": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "deepequalerrors": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "errorsas": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "findcall": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "httpresponse": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "ifaceassert": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "inspect": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "loopclosure": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "lostcancel": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "nilfunc": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "nilness": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "pkgfact": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "printf": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "shift": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "sortslice": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "stdmethods": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "stringintconv": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "structtag": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "testinggoroutine": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "tests": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "unmarshal": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "unreachable": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "unsafeptr": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  },
+  "unusedresult": {
+    "exclude_files": {
+      ".*/external/.*": "ignore external dependencies"
+    }
+  }
+}

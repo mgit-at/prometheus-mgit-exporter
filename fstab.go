@@ -53,7 +53,7 @@ func (c *FsTabChecker) Collect(ch chan<- prometheus.Metric) {
 
 	success := 1.0
 	if err != nil {
-		log.Println("failed to collect fstab: %v\n", err)
+		log.Println("failed to collect fstab:", err)
 		success = 0.0
 	}
 
