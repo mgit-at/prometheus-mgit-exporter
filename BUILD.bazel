@@ -1,0 +1,127 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "nogo")
+load("@rules_pkg//:pkg.bzl", "pkg_deb", "pkg_tar")
+
+gazelle(
+    name = "gazelle",
+    command = "fix",
+    prefix = "mgit.at/prometheus-mgit-exporter",
+)
+
+gazelle(
+    name = "gazelle-update-repos",
+    args = [
+        "-from_file=go.mod",
+        "-to_macro=go_deps.bzl%go_repositories",
+        "-prune",
+    ],
+    command = "update-repos",
+)
+
+TOOLS_NOGO = [
+    "@org_golang_x_tools//go/analysis/passes/asmdecl:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/assign:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/atomic:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/atomicalign:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/bools:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/buildssa:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/buildtag:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/composite:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/copylock:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/ctrlflow:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/deepequalerrors:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/errorsas:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/findcall:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/httpresponse:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/ifaceassert:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/inspect:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/loopclosure:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/lostcancel:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/nilfunc:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/nilness:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/pkgfact:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/printf:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/shift:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/sortslice:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/stdmethods:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/stringintconv:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/structtag:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/testinggoroutine:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/tests:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/unmarshal:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/unreachable:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/unsafeptr:go_tool_library",
+    "@org_golang_x_tools//go/analysis/passes/unusedresult:go_tool_library",
+    "//bazel/nogofmt:go_tool_library",
+]
+
+nogo(
+    name = "nogo",
+    config = "nogo.json",
+    visibility = ["//visibility:public"],
+    deps = TOOLS_NOGO,
+)
+
+go_library(
+    name = "prometheus-mgit-exporter_lib",
+    srcs = [
+        "certfile.go",
+        "elk.go",
+        "fstab.go",
+        "main.go",
+        "mcelog.go",
+        "mysqlbin.go",
+        "ptheartbeat.go",
+        "rasdaemon.go",
+    ],
+    importpath = "mgit.at/prometheus-mgit-exporter",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@com_github_mattn_go_zglob//:go-zglob",
+        "@com_github_pkg_errors//:errors",
+        "@com_github_prometheus_client_golang//prometheus",
+        "@com_github_prometheus_client_golang//prometheus/promhttp",
+    ],
+)
+
+go_binary(
+    name = "prometheus-mgit-exporter",
+    embed = [":prometheus-mgit-exporter_lib"],
+    visibility = ["//visibility:public"],
+)
+
+pkg_tar(
+    name = "debian-data",
+    extension = "tar.gz",
+    files = {
+        ":prometheus-mgit-exporter": "/usr/bin/prometheus-mgit-exporter",
+        ":config.json": "/etc/prometheus-mgit-exporter/config.json",
+        ":prometheus-mgit-exporter.service": "/lib/systemd/system/prometheus-mgit-exporter.service",
+        ":README.md": "/usr/share/doc/prometheus-mgit-exporter/README.md",
+        ":LICENSE": "/usr/share/doc/prometheus-mgit-exporter/LICENSE",
+    },
+    modes = {
+        "/usr/bin/prometheus-mgit-exporter": "0755",
+        "/etc/prometheus-mgit-exporter/config.json": "0644",
+        "/lib/systemd/system/prometheus-mgit-exporter.service": "0644",
+        "/usr/share/doc/prometheus-mgit-exporter/README.md": "0644",
+        "/usr/share/doc/prometheus-mgit-exporter/LICENSE": "0644",
+    },
+)
+
+pkg_deb(
+    name = "debian",
+    architecture = "amd64",
+    built_using = "bazel",
+    conffiles = [
+        "/etc/prometheus-mgit-exporter/config.json\n",
+    ],
+    data = ":debian-data",
+    depends = ["sqlite3"],
+    description = "A collection of useful monitoring for Prometheus by mgIT GmbH.",
+    homepage = "https://mgit.at/",
+    maintainer = "Christoph Hack <chack@mgit.at>",
+    package = "prometheus-mgit-exporter",
+    version = "1.7.0",
+    visibility = ["//visibility:public"],
+)

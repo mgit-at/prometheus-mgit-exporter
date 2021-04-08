@@ -44,7 +44,7 @@ License
 prometheus-mgit-exporter is distributed under the Apache License.
 See LICENSE for details.
 
-> Copyright 2017 mgIT GmbH.
+> Copyright 2021 mgIT GmbH.
 >
 > Licensed under the Apache License, Version 2.0 (the "License");
 > you may not use this file except in compliance with the License.
