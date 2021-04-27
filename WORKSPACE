@@ -4,10 +4,10 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "rules_mgit",
-    sha256 = "f23905d2273994f4a8230e1cbfa585c100024d716f44d09eabb34ed603504758",
-    strip_prefix = "rules_mgit-08348150e4a04506db22aec2c5c5e96d6eaf2242",
+    sha256 = "2f1111adb2faf67ad48170f9ab2a728fb1b7e60973ad1a2b561f19b434eb6faa",
+    strip_prefix = "rules_mgit-4a7ed03a8a094d7fbd0daee9ef5d7c68fc00c764",
     type = "zip",
-    urls = ["https://github.com/mgit-at/rules_mgit/archive/08348150e4a04506db22aec2c5c5e96d6eaf2242.zip"],
+    urls = ["https://github.com/mgit-at/rules_mgit/archive/4a7ed03a8a094d7fbd0daee9ef5d7c68fc00c764.zip"],
 )
 
 load("@rules_mgit//:deps.bzl", "rules_mgit_dependencies")
