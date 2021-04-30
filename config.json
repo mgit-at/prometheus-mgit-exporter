@@ -24,14 +24,7 @@
     "node": "m3-hot"
   },
   "exec": {
-    "enable": true,
-    "ids": {
-      "performance": {
-        "args": [
-            "./opt/check_performance.sh"
-          ],
-          "timeout": "5s"
-      }
-    }
+    "enable": false,
+    "scripts": {}
   }
 }

@@ -146,7 +146,7 @@ func run() error {
 	if cfg.Exec.Enable {
 		log.Println("enabling automatic execution of services on prometheus alert")
 		e := NewExecService(cfg.Exec.ExecOptions)
-		http.Handle("/exec/", http.HandlerFunc(e.handleExec))
+		http.HandleFunc("/exec/", e.handleExec)
 	}
 
 	srv := &http.Server{

@@ -67,6 +67,6 @@ pkg_deb(
     homepage = "https://mgit.at/",
     maintainer = "Christoph Hack <chack@mgit.at>",
     package = "prometheus-mgit-exporter",
-    version = "1.7.0",
+    version = "1.8.0",
     visibility = ["//visibility:public"],
 )

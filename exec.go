@@ -13,59 +13,57 @@ import (
 )
 
 type ExecOptions struct {
-	IDs map[string]CmdOptions `json:"ids"`
+	Scripts map[string]CmdOptions `json:"scripts"`
 }
 
 type CmdOptions struct {
-	Timeout time.Duration `json:"duration"`
-	Args    []string      `json:"args"`
+	Command []string      `json:"command"`
+	Timeout time.Duration `json:"timeout"`
 }
 
-type Service struct {
+type ExecService struct {
 	opts   ExecOptions
 	active map[string]bool
 	mu     sync.Mutex
 }
 
-func NewExecService(opts ExecOptions) *Service {
-	active := make(map[string]bool, len(opts.IDs))
-	for id := range opts.IDs {
-		active[id] = false
-	}
-	return &Service{
+func NewExecService(opts ExecOptions) *ExecService {
+	return &ExecService{
 		opts:   opts,
-		active: active,
+		active: make(map[string]bool, len(opts.Scripts)),
 	}
 }
 
-func (s *Service) handleExec(w http.ResponseWriter, r *http.Request) {
+func (s *ExecService) handleExec(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/exec/")
-
-	script, ok := s.opts.IDs[id]
+	script, ok := s.opts.Scripts[id]
 	if !ok {
 		http.Error(w, "please specify a valid id", http.StatusBadRequest)
 		return
 	}
+	fmt.Fprintln(w, "ok")
 
-	if s.setActive(id) {
-		http.Error(w, fmt.Sprintf("script %s is already running", id), http.StatusConflict)
-		return
-	}
+	go func() {
+		if s.setActive(id) {
+			log.Printf("script %q is already running", id)
+			return
+		}
+		defer s.unsetActive(id)
 
-	ctx, cancel := context.WithTimeout(r.Context(), s.opts.IDs[id].Timeout)
-	defer cancel()
-	cmd := exec.CommandContext(ctx, script.Args[0], script.Args[1:]...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+		ctx, cancel := context.WithTimeout(context.Background(), script.Timeout)
+		defer cancel()
 
-	if err := cmd.Run(); err != nil {
-		log.Println("exec.Run", err)
-		http.Error(w, fmt.Sprintf("failed to run script %s", id), http.StatusInternalServerError)
-	}
-	s.unsetActive(id)
+		cmd := exec.CommandContext(ctx, script.Command[0], script.Command[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		if err := cmd.Run(); err != nil {
+			log.Printf("failed to runs script %q: %v", id, err)
+		}
+	}()
 }
 
-func (s *Service) setActive(id string) bool {
+func (s *ExecService) setActive(id string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.active[id] {
@@ -75,7 +73,7 @@ func (s *Service) setActive(id string) bool {
 	return true
 }
 
-func (s *Service) unsetActive(id string) {
+func (s *ExecService) unsetActive(id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
