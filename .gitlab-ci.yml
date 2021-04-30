@@ -1,6 +1,8 @@
 ---
 stages:
   - build
+  - upload
+  - add
 
 build:
   stage: build
@@ -9,3 +11,35 @@ build:
   tags:
     - mgit
     - bazel
+
+upload:
+  stage: upload
+  script:
+    - upload-deb --config upload-deb.yaml
+  artifacts:
+    paths:
+      - deb-out/*
+  only:
+    refs:
+      - master
+  tags:
+    - mgit
+    - bazel
+
+add:
+  stage: add
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - ~/upload-deb.py
+  only:
+    refs:
+      - master
+  after_script:
+    - rm -r deb-out/
+  needs:
+    - job: upload
+      artifacts: true
+  tags:
+    - mgit
+    - pkg

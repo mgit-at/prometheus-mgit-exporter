@@ -1,0 +1,58 @@
+repos:
+  - name: dpkg-buster
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/buster/Release"
+  - name: dpkg-stretch
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/stretch/Release"
+
+publickey: |
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+    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
+    =XuVw
+    -----END PGP PUBLIC KEY BLOCK-----
