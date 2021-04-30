@@ -22,5 +22,9 @@
     "enable": true,
     "duration": "170h",
     "node": "m3-hot"
+  },
+  "exec": {
+    "enable": false,
+    "scripts": {}
   }
 }

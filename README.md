@@ -35,6 +35,15 @@ This is an example configuration file with all checks enabled:
       "mcelog": {
         "enable": false,
         "path": "/var/log/mcelog"
+      },
+      "exec": {
+        "enable": true,
+        "scripts": {
+          "performance": {
+            "command": ["./opt/check_performance.sh"],
+            "timeout": "5s"
+          }
+        }
       }
     }
 
