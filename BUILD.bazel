@@ -11,6 +11,7 @@ go_library(
     srcs = [
         "certfile.go",
         "elk.go",
+        "exec.go",
         "fstab.go",
         "main.go",
         "mcelog.go",

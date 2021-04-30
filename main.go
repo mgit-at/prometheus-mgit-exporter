@@ -47,6 +47,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		ElkOptions
 	} `json:"elk"`
+	Exec struct {
+		Enable bool `json:"enable"`
+		ExecOptions
+	} `json:"exec"`
 }
 
 func run() error {
@@ -138,6 +142,12 @@ func run() error {
 	log.Println("listening on", listen.Addr())
 
 	http.Handle("/metrics", promhttp.Handler())
+
+	if cfg.Exec.Enable {
+		log.Println("enabling automatic execution of services on prometheus alert")
+		e := NewExecService(cfg.Exec.ExecOptions)
+		http.Handle("/exec/", http.HandlerFunc(e.handleExec))
+	}
 
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,

@@ -22,5 +22,16 @@
     "enable": true,
     "duration": "170h",
     "node": "m3-hot"
+  },
+  "exec": {
+    "enable": true,
+    "ids": {
+      "performance": {
+        "args": [
+            "./opt/check_performance.sh"
+          ],
+          "timeout": "5s"
+      }
+    }
   }
 }
