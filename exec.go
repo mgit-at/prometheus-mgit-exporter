@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type ExecOptions struct {
@@ -17,8 +20,25 @@ type ExecOptions struct {
 }
 
 type CmdOptions struct {
-	Command []string      `json:"command"`
-	Timeout time.Duration `json:"timeout"`
+	Command []string
+	Timeout time.Duration
+}
+
+func (c *CmdOptions) UnmarshalJSON(data []byte) error {
+	var opt struct {
+		Command []string `json:"command"`
+		Timeout string   `json:"timeout"`
+	}
+	if err := json.Unmarshal(data, &opt); err != nil {
+		return err
+	}
+	d, err := time.ParseDuration(opt.Timeout)
+	if err != nil {
+		return errors.Wrap(err, "time.ParseDuration")
+	}
+	c.Command = opt.Command
+	c.Timeout = d
+	return nil
 }
 
 type ExecService struct {
