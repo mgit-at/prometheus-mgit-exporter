@@ -21,12 +21,14 @@ type ExecOptions struct {
 
 type CmdOptions struct {
 	Command []string
+	Dir     string
 	Timeout time.Duration
 }
 
 func (c *CmdOptions) UnmarshalJSON(data []byte) error {
 	var opt struct {
 		Command []string `json:"command"`
+		Dir     string   `json:"dir"`
 		Timeout string   `json:"timeout"`
 	}
 	if err := json.Unmarshal(data, &opt); err != nil {
@@ -37,6 +39,7 @@ func (c *CmdOptions) UnmarshalJSON(data []byte) error {
 		return errors.Wrap(err, "time.ParseDuration")
 	}
 	c.Command = opt.Command
+	c.Dir = opt.Dir
 	c.Timeout = d
 	return nil
 }
@@ -64,7 +67,7 @@ func (s *ExecService) handleExec(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "ok")
 
 	go func() {
-		if s.setActive(id) {
+		if !s.setActive(id) {
 			log.Printf("script %q is already running", id)
 			return
 		}
@@ -76,6 +79,7 @@ func (s *ExecService) handleExec(w http.ResponseWriter, r *http.Request) {
 		cmd := exec.CommandContext(ctx, script.Command[0], script.Command[1:]...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+		cmd.Dir = script.Dir
 
 		if err := cmd.Run(); err != nil {
 			log.Printf("failed to runs script %q: %v", id, err)
