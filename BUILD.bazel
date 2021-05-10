@@ -71,6 +71,6 @@ pkg_deb(
         "repo:dpkg-buster",
         "repo:dpkg-stretch",
     ],
-    version = "1.9.0",
+    version = "1.9.1",
     visibility = ["//visibility:public"],
 )

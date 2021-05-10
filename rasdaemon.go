@@ -5,6 +5,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/pkg/errors"
@@ -28,7 +29,7 @@ func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 		opts.Path = "/var/lib/rasdaemon/ras-mc_event.db"
 	}
 
-	db, err := sql.Open("sqlite", opts.Path+"?mode=ro")
+	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s?mode=ro", opts.Path))
 	if err != nil {
 		return nil, errors.Wrap(err, "sql.Open")
 	}
