@@ -4,12 +4,12 @@
 package main
 
 import (
-	"bytes"
+	"database/sql"
 	"log"
-	"os/exec"
-	"strconv"
 
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
+	_ "modernc.org/sqlite"
 )
 
 type RasDaemonOptions struct {
@@ -18,22 +18,29 @@ type RasDaemonOptions struct {
 
 type RasdaemonChecker struct {
 	opts RasDaemonOptions
+	db   *sql.DB
 
 	promRasdaemonSize *prometheus.Desc
 }
 
-func NewRasdaemonChecker(opts RasDaemonOptions) *RasdaemonChecker {
+func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 	if opts.Path == "" {
 		opts.Path = "/var/lib/rasdaemon/ras-mc_event.db"
 	}
 
+	db, err := sql.Open("sqlite", opts.Path+"?mode=ro")
+	if err != nil {
+		return nil, errors.Wrap(err, "sql.Open")
+	}
+
 	return &RasdaemonChecker{
 		opts: opts,
+		db:   db,
 		promRasdaemonSize: prometheus.NewDesc(
 			"rasdaemon_entries_total",
 			"size of the rasdaemon mc-event log",
-			nil, nil),
-	}
+			[]string{"event"}, nil),
+	}, nil
 }
 
 func (c *RasdaemonChecker) Describe(ch chan<- *prometheus.Desc) {
@@ -41,26 +48,36 @@ func (c *RasdaemonChecker) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (c *RasdaemonChecker) Collect(ch chan<- prometheus.Metric) {
-	cmd := exec.Command("sqlite3",
-		c.opts.Path,
-		"select count(*) from mce_record;",
-	)
-
-	output, err := cmd.Output()
+	rows, err := c.db.Query("select bank_name, count(id) from mce_record group by bank_name")
 	if err != nil {
-		log.Println("failed to run sqlite3:", err)
+		log.Println("failed to query mce_record:", err)
+		return
 	}
+	defer rows.Close()
+	for rows.Next() {
+		var size int
+		var event string
 
-	output = bytes.TrimSpace(output)
+		if err := rows.Scan(&event, &size); err != nil {
+			log.Println("sql.Scan:", err)
+			continue
+		}
 
-	size, err := strconv.ParseInt(string(output), 10, 64)
-	if err != nil {
-		log.Println("failed to parse sqlite3 output")
+		ch <- prometheus.MustNewConstMetric(
+			c.promRasdaemonSize,
+			prometheus.GaugeValue,
+			float64(size),
+			event,
+		)
 	}
+	if err := rows.Err(); err != nil {
+		log.Println("sql.Next:", err)
+	}
+}
 
-	ch <- prometheus.MustNewConstMetric(
-		c.promRasdaemonSize,
-		prometheus.GaugeValue,
-		float64(size),
-	)
+func (c *RasdaemonChecker) Close() error {
+	if err := c.db.Close(); err != nil {
+		return errors.Wrap(err, "sql.Close")
+	}
+	return nil
 }

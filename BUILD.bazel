@@ -26,6 +26,7 @@ go_library(
         "@com_github_pkg_errors//:errors",
         "@com_github_prometheus_client_golang//prometheus",
         "@com_github_prometheus_client_golang//prometheus/promhttp",
+        "@org_modernc_sqlite//:sqlite",
     ],
 )
 
@@ -62,7 +63,6 @@ pkg_deb(
         "/etc/prometheus-mgit-exporter/config.json\n",
     ],
     data = ":debian-data",
-    depends = ["sqlite3"],
     description = "A collection of useful monitoring for Prometheus by mgIT GmbH.",
     homepage = "https://mgit.at/",
     maintainer = "Christoph Hack <chack@mgit.at>",
@@ -71,6 +71,6 @@ pkg_deb(
         "repo:dpkg-buster",
         "repo:dpkg-stretch",
     ],
-    version = "1.8.2",
+    version = "1.9.0",
     visibility = ["//visibility:public"],
 )

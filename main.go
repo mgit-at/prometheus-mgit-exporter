@@ -13,6 +13,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -116,7 +117,11 @@ func run() error {
 
 	if cfg.RasDaemon.Enable {
 		log.Println("enabling rasdaemon checker")
-		c := NewRasdaemonChecker(cfg.RasDaemon.RasDaemonOptions)
+		c, err := NewRasdaemonChecker(cfg.RasDaemon.RasDaemonOptions)
+		if err != nil {
+			return errors.Wrap(err, "NewRasdaemonChecker")
+		}
+		defer c.Close()
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register rasdaemon checker: %v", err)
 		}
