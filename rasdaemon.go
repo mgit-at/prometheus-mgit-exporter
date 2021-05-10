@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -40,7 +41,7 @@ func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 		promRasdaemonSize: prometheus.NewDesc(
 			"rasdaemon_entries_total",
 			"size of the rasdaemon mc-event log",
-			[]string{"event"}, nil),
+			[]string{"bank", "bank_name"}, nil),
 	}, nil
 }
 
@@ -49,7 +50,7 @@ func (c *RasdaemonChecker) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (c *RasdaemonChecker) Collect(ch chan<- prometheus.Metric) {
-	rows, err := c.db.Query("select bank_name, count(id) from mce_record group by bank_name")
+	rows, err := c.db.Query("select bank, bank_name, count(id) from mce_record group by bank, bank_name")
 	if err != nil {
 		log.Println("failed to query mce_record:", err)
 		return
@@ -57,9 +58,10 @@ func (c *RasdaemonChecker) Collect(ch chan<- prometheus.Metric) {
 	defer rows.Close()
 	for rows.Next() {
 		var size int
-		var event string
+		var bank int
+		var bankName string
 
-		if err := rows.Scan(&event, &size); err != nil {
+		if err := rows.Scan(&bank, &bankName, &size); err != nil {
 			log.Println("sql.Scan:", err)
 			continue
 		}
@@ -68,7 +70,8 @@ func (c *RasdaemonChecker) Collect(ch chan<- prometheus.Metric) {
 			c.promRasdaemonSize,
 			prometheus.GaugeValue,
 			float64(size),
-			event,
+			strconv.Itoa(bank),
+			bankName,
 		)
 	}
 	if err := rows.Err(); err != nil {
