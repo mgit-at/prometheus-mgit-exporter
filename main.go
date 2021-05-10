@@ -117,11 +117,11 @@ func run() error {
 
 	if cfg.RasDaemon.Enable {
 		log.Println("enabling rasdaemon checker")
-		c, db, err := NewRasdaemonChecker(cfg.RasDaemon.RasDaemonOptions)
+		c, err := NewRasdaemonChecker(cfg.RasDaemon.RasDaemonOptions)
 		if err != nil {
 			return errors.Wrap(err, "NewRasdaemonChecker")
 		}
-		defer db.Close()
+		defer c.Close()
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register rasdaemon checker: %v", err)
 		}

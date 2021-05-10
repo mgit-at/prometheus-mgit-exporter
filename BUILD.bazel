@@ -63,7 +63,6 @@ pkg_deb(
         "/etc/prometheus-mgit-exporter/config.json\n",
     ],
     data = ":debian-data",
-    depends = ["sqlite3"],
     description = "A collection of useful monitoring for Prometheus by mgIT GmbH.",
     homepage = "https://mgit.at/",
     maintainer = "Christoph Hack <chack@mgit.at>",
