@@ -19,7 +19,7 @@ type PTHeartbeatOptions struct {
 	Database     string `json:"database"`
 	Table        string `json:"table"`
 	DefaultsFile string `json:"defaultsFile"`
-	MasterID     int    `json:"masterID"`
+	MasterID     int    `json:"masterId"`
 }
 
 func (opts *PTHeartbeatOptions) initDefault() {
