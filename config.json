@@ -12,14 +12,26 @@
     "enable": false,
     "path": "/var/log/mcelog"
   },
+  "ptheartbeat": {
+    "enable": false,
+    "database": "system",
+    "table": "pt_heartbeat",
+    "defaultsFile": "/etc/mysql/debian.cnf",
+    "masterId": 0
+  },
   "fstab": {
-    "enable": true
+    "enable": false
+  },
+  "binlog": {
+    "enable": false,
+    "path": "var/log/mysql"
   },
   "rasdaemon": {
-    "enable": true
+    "enable": false,
+    "path": "/var/lib/rasdaemon/ras-mc_event.db"
   },
   "elk": {
-    "enable": true,
+    "enable": false,
     "duration": "170h",
     "node": "m3-hot"
   },

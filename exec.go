@@ -34,6 +34,10 @@ func (c *CmdOptions) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &opt); err != nil {
 		return err
 	}
+
+	if opt.Timeout == "" {
+		opt.Timeout = "5s"
+	}
 	d, err := time.ParseDuration(opt.Timeout)
 	if err != nil {
 		return errors.Wrap(err, "time.ParseDuration")
@@ -82,7 +86,7 @@ func (s *ExecService) handleExec(w http.ResponseWriter, r *http.Request) {
 		cmd.Dir = script.Dir
 
 		if err := cmd.Run(); err != nil {
-			log.Printf("failed to runs script %q: %v", id, err)
+			log.Printf("failed to run script %q: %v", id, err)
 		}
 	}()
 }
