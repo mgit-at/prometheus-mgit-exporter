@@ -19,7 +19,7 @@ Walks certain directories (like ``/etc/ssl``, globbing configureable) and export
 
 - ``enable`` (bool): activate or deactivate this check
 - ``globs`` ([]string): globbing patterns
-- ``exclude\_system`` (bool): exclude certs in ``/etc/ssl/certs/`` if set to true
+- ``exclude_system`` (bool): exclude certs in ``/etc/ssl/certs/`` if set to true
 
 ### **mcelog** ###
 
@@ -75,7 +75,7 @@ Reports the number of ELK (elasticsearch) indices that are on a node longer than
 
 ### **exec** ###
 
-Runs your own executables (e.g collecting additional information, restarting a service etc) via the endpoint ``/exec/\<id>``. If the executable is already running, no additional processes will be spawned. All executables will be killed after the specified timeout forcefully.
+Runs your own executables (e.g collecting additional information, restarting a service etc) via the endpoint ``/exec/<id>``. If the executable is already running, no additional processes will be spawned. All executables will be killed after the specified timeout forcefully.
 
 **Parameters:**
 
