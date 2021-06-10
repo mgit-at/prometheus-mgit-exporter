@@ -1,8 +1,16 @@
 repos:
+  - name: dpkg-bionic
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/bionic/Release"
+  - name: dpkg-bullseye
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/bullseye/Release"
   - name: dpkg-buster
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/buster/Release"
+  - name: dpkg-focal
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/focal/Release"
   - name: dpkg-stretch
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/stretch/Release"
+  - name: dpkg-xenial
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/xenial/Release"
 
 publickey: |
     -----BEGIN PGP PUBLIC KEY BLOCK-----

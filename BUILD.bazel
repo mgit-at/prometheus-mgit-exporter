@@ -68,8 +68,12 @@ pkg_deb(
     maintainer = "Christoph Hack <chack@mgit.at>",
     package = "prometheus-mgit-exporter",
     tags = [
+        "repo:dpkg-bionic",
+        "repo:dpkg-bullseye",
         "repo:dpkg-buster",
+        "repo:dpkg-focal",
         "repo:dpkg-stretch",
+        "repo:dpkg-xenial",
     ],
     version = "1.9.2",
     visibility = ["//visibility:public"],
