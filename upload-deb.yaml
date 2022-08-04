@@ -11,6 +11,8 @@ repos:
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/stretch/Release"
   - name: dpkg-xenial
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/xenial/Release"
+  - name: dpkg-jammy
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/jammy/Release"
 
 publickey: |
     -----BEGIN PGP PUBLIC KEY BLOCK-----
