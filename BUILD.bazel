@@ -74,6 +74,7 @@ pkg_deb(
         "repo:dpkg-focal",
         "repo:dpkg-stretch",
         "repo:dpkg-xenial",
+        "repo:dpkg-jammy",
     ],
     version = "1.9.2",
     visibility = ["//visibility:public"],
