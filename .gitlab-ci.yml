@@ -9,8 +9,7 @@ build:
   script:
     - bazel build --keep_going //...
   tags:
-    - mgit
-    - bazel
+    - k8s-mgit-bazel
 
 upload:
   stage: upload
@@ -23,8 +22,7 @@ upload:
     refs:
       - master
   tags:
-    - mgit
-    - bazel
+    - k8s-mgit-bazel
 
 add:
   stage: add
