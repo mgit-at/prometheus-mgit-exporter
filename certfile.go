@@ -6,8 +6,8 @@ package main
 import (
 	"crypto/x509"
 	"encoding/pem"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -68,7 +68,7 @@ func (c *CertFileChecker) collectCert(p string, ch chan<- prometheus.Metric) err
 		}
 		p = absPath
 	}
-	data, err := ioutil.ReadFile(p)
+	data, err := os.ReadFile(p)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read file")
 	}

@@ -4,6 +4,7 @@ Documentation=https://prometheus.io/docs/introduction/overview/
 
 [Service]
 ExecStart=/usr/bin/prometheus-mgit-exporter -config /etc/prometheus-mgit-exporter/config.json
+MemoryMax=1G
 Restart=on-failure
 RestartSec=1
 
