@@ -24,7 +24,7 @@
   },
   "binlog": {
     "enable": false,
-    "path": "var/log/mysql"
+    "path": "/var/log/mysql"
   },
   "rasdaemon": {
     "enable": false,

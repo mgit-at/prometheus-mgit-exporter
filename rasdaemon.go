@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -30,9 +31,17 @@ func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 		opts.Path = "/var/lib/rasdaemon/ras-mc_event.db"
 	}
 
+	if _, err := os.Stat(opts.Path); errors.Is(err, os.ErrNotExist) {
+		return nil, errors.Wrapf(err, "file %q does not exist", opts.Path)
+	}
+
 	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s?mode=ro", opts.Path))
 	if err != nil {
 		return nil, errors.Wrap(err, "sql.Open")
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, errors.Wrap(err, "db.Ping")
 	}
 
 	return &RasdaemonChecker{
