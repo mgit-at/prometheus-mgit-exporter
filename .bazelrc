@@ -1,3 +1,6 @@
+# enable using bazel modules
+build --enable_bzlmod
+
 # disable convenience symlinks, since the huge amount of files
 # and frequent updates cause troubles with many editors and tools.
 build --symlink_prefix=/

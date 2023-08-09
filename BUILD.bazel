@@ -1,10 +1,5 @@
-load("@rules_mgit//:def.bzl", "mgit_repo_rules")
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "nogo")
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "nogo")
 load("@rules_pkg//:pkg.bzl", "pkg_deb", "pkg_tar")
-
-mgit_repo_rules(
-    go_prefix = "mgit.at/prometheus-mgit-exporter",
-)
 
 go_library(
     name = "prometheus-mgit-exporter_lib",
