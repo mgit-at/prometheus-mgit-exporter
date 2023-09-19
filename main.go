@@ -55,9 +55,7 @@ type Config struct {
 }
 
 func run() error {
-	var (
-		flagConfig = flag.String("config", "config.json", "configuration file")
-	)
+	flagConfig := flag.String("config", "config.json", "configuration file")
 	flag.Parse()
 	if flag.NArg() != 0 {
 		flag.Usage()
@@ -133,7 +131,6 @@ func run() error {
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register elk checker: %v", err)
 		}
-
 	}
 
 	if cfg.Listen == "" {

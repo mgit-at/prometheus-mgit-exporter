@@ -13,8 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type FsTabOptions struct {
-}
+type FsTabOptions struct{}
 
 func (opts *FsTabOptions) initDefault() {
 }
