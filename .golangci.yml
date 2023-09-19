@@ -1,0 +1,13 @@
+linters:
+  enable-all: true
+  disable:
+    - scopelint # deprecated (since v1.39.0)
+    - nosnakecase # deprecated (since v1.48.1)
+    - ifshort # deprecated (since v1.48.0)
+    - wsl # assignments should only be cuddled with other assignments
+    - funlen # Function has too many statements
+    - nlreturn # return with no blank line before
+    - depguard
+    - gomnd
+    - tagliatelle # json(camel)
+  fast: true
