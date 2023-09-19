@@ -6,10 +6,13 @@ bazel_dep(name = "rules_pkg", version = "0.9.1")
 bazel_dep(name = "rules_go", version = "0.41.0")
 bazel_dep(name = "gazelle", version = "0.32.0")
 
+# ------------------------------------------------------------------------------
+# All *direct* Go dependencies of the module have to be listed explicitly.
+# ------------------------------------------------------------------------------
+
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")
 
-# All *direct* Go dependencies of the module have to be listed explicitly.
 use_repo(
     go_deps,
     "org_modernc_sqlite",
