@@ -1,8 +1,17 @@
 ---
 stages:
+  - linter
   - build
   - upload
   - add
+
+lint:
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
+  stage: linter
+  script:
+    # Use default .golangci.yml file from the image if one is not present in the project root.
+    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
+    - golangci-lint run
 
 build:
   stage: build
