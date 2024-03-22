@@ -1,17 +1,19 @@
-From b2a6008eda93101ee6d62b23fd48fda1f88bb4c3 Mon Sep 17 00:00:00 2001
+From fa4e0bd2f9fd91913d447d6e08c3d672eedcb8a9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
-Date: Fri, 22 Mar 2024 22:20:58 +0100
+Date: Fri, 22 Mar 2024 22:42:13 +0100
 Subject: [PATCH] nixos/prometheus: abbility to add downstream exporters
 
 ---
  .../monitoring/prometheus/exporters.md        |  17 ++
  .../monitoring/prometheus/exporters.nix       | 127 +-------------
+ .../prometheus/mk-downstream-exporter.nix     |   8 +
  .../monitoring/prometheus/mk-exporter.nix     | 165 ++++++++++++++++++
- 3 files changed, 184 insertions(+), 125 deletions(-)
+ 4 files changed, 192 insertions(+), 125 deletions(-)
+ create mode 100644 nixos/modules/services/monitoring/prometheus/mk-downstream-exporter.nix
  create mode 100644 nixos/modules/services/monitoring/prometheus/mk-exporter.nix
 
 diff --git a/nixos/modules/services/monitoring/prometheus/exporters.md b/nixos/modules/services/monitoring/prometheus/exporters.md
-index 34fadecadc74..55fd696e0719 100644
+index 34fadecadc74..b1aaf79a299b 100644
 --- a/nixos/modules/services/monitoring/prometheus/exporters.md
 +++ b/nixos/modules/services/monitoring/prometheus/exporters.md
 @@ -178,3 +178,20 @@ in
@@ -19,20 +21,20 @@ index 34fadecadc74..55fd696e0719 100644
  }
  ```
 +
-+## Adding a downstream exporter {#module-services-prometheus-exporters-new-exporter}
++## Adding a downstream exporter {#module-services-prometheus-exporters-downstream-exporter}
 +
-+First create the exporter file, `exporter.nix` as you would with an upstream exporter
++First create the exporter file, `EXPORTER-exporter.nix` as you would with an upstream exporter
 +
 +Then create a module that imports the exporter
 +
 +```nix
-+{ config, pkgs, lib, options, utils, ... }@args:
-+
-+with (import ./mk-exporter.nix lib);
-+
-+{
-+  options.services.prometheus.exporters = mkDownstreamOptions "EXPORTER" (import ./EXPORTER.nix args);
-+  config = mkDownstreamConfig "EXPORTER" (import ./EXPORTER.nix args) config.services.prometheus.exporters.EXPORTER;
++{ modulesPath, ... }{
++  imports = [
++    (import "${modulesPath}/services/monitoring/prometheus/mk-downstream-exporter.nix" {
++      name = "EXPORTER";
++      file = ./EXPORTER-exporter.nix;
++    })
++  ];
 +}
 +```
 diff --git a/nixos/modules/services/monitoring/prometheus/exporters.nix b/nixos/modules/services/monitoring/prometheus/exporters.nix
@@ -186,6 +188,20 @@ index b46b4596d563..8d3959df5e78 100644
  in
  {
  
+diff --git a/nixos/modules/services/monitoring/prometheus/mk-downstream-exporter.nix b/nixos/modules/services/monitoring/prometheus/mk-downstream-exporter.nix
+new file mode 100644
+index 000000000000..b9dcd530d010
+--- /dev/null
++++ b/nixos/modules/services/monitoring/prometheus/mk-downstream-exporter.nix
+@@ -0,0 +1,8 @@
++{ name, file }: { config, pkgs, lib, options, utils, ... }@args:
++
++with (import ./mk-exporter.nix lib);
++
++{
++  options.services.prometheus.exporters = mkDownstreamOptions name (import file args);
++  config = mkDownstreamConfig name (import file args) config.services.prometheus.exporters.${name};
++}
 diff --git a/nixos/modules/services/monitoring/prometheus/mk-exporter.nix b/nixos/modules/services/monitoring/prometheus/mk-exporter.nix
 new file mode 100644
 index 000000000000..0e4efce62813
