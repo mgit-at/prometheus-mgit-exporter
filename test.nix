@@ -4,6 +4,7 @@
 
   nodes = {
     server = { lib, pkgs, ... }: {
+      imports = [ ./module.nix ];
       services.prometheus.exporters.mgit.enable = true;
     };
   };

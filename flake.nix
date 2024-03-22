@@ -8,20 +8,23 @@
       supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
 
-      patches = ''
-        cp ${./module.nix} nixos/modules/services/monitoring/prometheus/exporters/mgit.nix
-        sed 's|"apcupsd"|"apcupsd" "mgit"|g' -i nixos/modules/services/monitoring/prometheus/exporters.nix
-      '';
+      patches = [
+        ./nixos-prom-downstream.patch
+      ];
 
       patchPkgs = nixpkgs: system: let
         origPkgs = import "${nixpkgs}" { inherit system; };
-      in origPkgs.stdenv.mkDerivation {
+      in origPkgs.stdenvNoCC.mkDerivation {
         name = "patched-nixpkgs";
         src = "${nixpkgs}";
         dontBuild = true;
         dontFixup = true;
+        nativeBuildInputs = [ origPkgs.git ];
         installPhase = ''
-          ${patches}
+          for p in ${origPkgs.lib.concatStringsSep " " patches}; do
+            echo "applying patch $p"
+            git apply -p1 "$p"
+          done
           cp -r . $out
         '';
       };
@@ -31,7 +34,7 @@
         prometheus-mgit-exporter = prev.callPackage ./. {};
       };
 
-      patchNixpkgs = patches;
+      patches4nixpkgs = patches;
 
       packages = forAllSystems (system:
         let

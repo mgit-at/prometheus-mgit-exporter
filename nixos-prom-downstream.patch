@@ -1,0 +1,362 @@
+From b2a6008eda93101ee6d62b23fd48fda1f88bb4c3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maciej=20Kr=C3=BCger?= <mkg20001@gmail.com>
+Date: Fri, 22 Mar 2024 22:20:58 +0100
+Subject: [PATCH] nixos/prometheus: abbility to add downstream exporters
+
+---
+ .../monitoring/prometheus/exporters.md        |  17 ++
+ .../monitoring/prometheus/exporters.nix       | 127 +-------------
+ .../monitoring/prometheus/mk-exporter.nix     | 165 ++++++++++++++++++
+ 3 files changed, 184 insertions(+), 125 deletions(-)
+ create mode 100644 nixos/modules/services/monitoring/prometheus/mk-exporter.nix
+
+diff --git a/nixos/modules/services/monitoring/prometheus/exporters.md b/nixos/modules/services/monitoring/prometheus/exporters.md
+index 34fadecadc74..55fd696e0719 100644
+--- a/nixos/modules/services/monitoring/prometheus/exporters.md
++++ b/nixos/modules/services/monitoring/prometheus/exporters.md
+@@ -178,3 +178,20 @@ in
+   ];
+ }
+ ```
++
++## Adding a downstream exporter {#module-services-prometheus-exporters-new-exporter}
++
++First create the exporter file, `exporter.nix` as you would with an upstream exporter
++
++Then create a module that imports the exporter
++
++```nix
++{ config, pkgs, lib, options, utils, ... }@args:
++
++with (import ./mk-exporter.nix lib);
++
++{
++  options.services.prometheus.exporters = mkDownstreamOptions "EXPORTER" (import ./EXPORTER.nix args);
++  config = mkDownstreamConfig "EXPORTER" (import ./EXPORTER.nix args) config.services.prometheus.exporters.EXPORTER;
++}
++```
+diff --git a/nixos/modules/services/monitoring/prometheus/exporters.nix b/nixos/modules/services/monitoring/prometheus/exporters.nix
+index b46b4596d563..8d3959df5e78 100644
+--- a/nixos/modules/services/monitoring/prometheus/exporters.nix
++++ b/nixos/modules/services/monitoring/prometheus/exporters.nix
+@@ -1,5 +1,7 @@
+ { config, pkgs, lib, options, utils, ... }:
+ 
++with (import ./mk-exporter.nix lib);
++
+ let
+   inherit (lib) concatStrings foldl foldl' genAttrs literalExpression maintainers
+     mapAttrs mapAttrsToList mkDefault mkEnableOption mkIf mkMerge mkOption
+@@ -126,79 +128,6 @@ let
+     }
+   );
+ 
+-  mkExporterOpts = ({ name, port }: {
+-    enable = mkEnableOption (lib.mdDoc "the prometheus ${name} exporter");
+-    port = mkOption {
+-      type = types.port;
+-      default = port;
+-      description = lib.mdDoc ''
+-        Port to listen on.
+-      '';
+-    };
+-    listenAddress = mkOption {
+-      type = types.str;
+-      default = "0.0.0.0";
+-      description = lib.mdDoc ''
+-        Address to listen on.
+-      '';
+-    };
+-    extraFlags = mkOption {
+-      type = types.listOf types.str;
+-      default = [];
+-      description = lib.mdDoc ''
+-        Extra commandline options to pass to the ${name} exporter.
+-      '';
+-    };
+-    openFirewall = mkOption {
+-      type = types.bool;
+-      default = false;
+-      description = lib.mdDoc ''
+-        Open port in firewall for incoming connections.
+-      '';
+-    };
+-    firewallFilter = mkOption {
+-      type = types.nullOr types.str;
+-      default = null;
+-      example = literalExpression ''
+-        "-i eth0 -p tcp -m tcp --dport ${toString port}"
+-      '';
+-      description = lib.mdDoc ''
+-        Specify a filter for iptables to use when
+-        {option}`services.prometheus.exporters.${name}.openFirewall`
+-        is true. It is used as `ip46tables -I nixos-fw firewallFilter -j nixos-fw-accept`.
+-      '';
+-    };
+-    user = mkOption {
+-      type = types.str;
+-      default = "${name}-exporter";
+-      description = lib.mdDoc ''
+-        User name under which the ${name} exporter shall be run.
+-      '';
+-    };
+-    group = mkOption {
+-      type = types.str;
+-      default = "${name}-exporter";
+-      description = lib.mdDoc ''
+-        Group under which the ${name} exporter shall be run.
+-      '';
+-    };
+-  });
+-
+-  mkSubModule = { name, port, extraOpts, imports }: {
+-    ${name} = mkOption {
+-      type = types.submodule [{
+-        inherit imports;
+-        options = (mkExporterOpts {
+-          inherit name port;
+-        } // extraOpts);
+-      } ({ config, ... }: mkIf config.openFirewall {
+-        firewallFilter = mkDefault "-p tcp -m tcp --dport ${toString config.port}";
+-      })];
+-      internal = true;
+-      default = {};
+-    };
+-  };
+-
+   mkSubModules = (foldl' (a: b: a//b) {}
+     (mapAttrsToList (name: opts: mkSubModule {
+       inherit name;
+@@ -207,58 +136,6 @@ let
+       imports = opts.imports or [];
+     }) exporterOpts)
+   );
+-
+-  mkExporterConf = { name, conf, serviceOpts }:
+-    let
+-      enableDynamicUser = serviceOpts.serviceConfig.DynamicUser or true;
+-    in
+-    mkIf conf.enable {
+-      warnings = conf.warnings or [];
+-      users.users."${name}-exporter" = (mkIf (conf.user == "${name}-exporter" && !enableDynamicUser) {
+-        description = "Prometheus ${name} exporter service user";
+-        isSystemUser = true;
+-        inherit (conf) group;
+-      });
+-      users.groups = (mkIf (conf.group == "${name}-exporter" && !enableDynamicUser) {
+-        "${name}-exporter" = {};
+-      });
+-      networking.firewall.extraCommands = mkIf conf.openFirewall (concatStrings [
+-        "ip46tables -A nixos-fw ${conf.firewallFilter} "
+-        "-m comment --comment ${name}-exporter -j nixos-fw-accept"
+-      ]);
+-      systemd.services."prometheus-${name}-exporter" = mkMerge ([{
+-        wantedBy = [ "multi-user.target" ];
+-        after = [ "network.target" ];
+-        serviceConfig.Restart = mkDefault "always";
+-        serviceConfig.PrivateTmp = mkDefault true;
+-        serviceConfig.WorkingDirectory = mkDefault /tmp;
+-        serviceConfig.DynamicUser = mkDefault enableDynamicUser;
+-        serviceConfig.User = mkDefault conf.user;
+-        serviceConfig.Group = conf.group;
+-        # Hardening
+-        serviceConfig.CapabilityBoundingSet = mkDefault [ "" ];
+-        serviceConfig.DeviceAllow = [ "" ];
+-        serviceConfig.LockPersonality = true;
+-        serviceConfig.MemoryDenyWriteExecute = true;
+-        serviceConfig.NoNewPrivileges = true;
+-        serviceConfig.PrivateDevices = mkDefault true;
+-        serviceConfig.ProtectClock = mkDefault true;
+-        serviceConfig.ProtectControlGroups = true;
+-        serviceConfig.ProtectHome = true;
+-        serviceConfig.ProtectHostname = true;
+-        serviceConfig.ProtectKernelLogs = true;
+-        serviceConfig.ProtectKernelModules = true;
+-        serviceConfig.ProtectKernelTunables = true;
+-        serviceConfig.ProtectSystem = mkDefault "strict";
+-        serviceConfig.RemoveIPC = true;
+-        serviceConfig.RestrictAddressFamilies = [ "AF_INET" "AF_INET6" ];
+-        serviceConfig.RestrictNamespaces = true;
+-        serviceConfig.RestrictRealtime = true;
+-        serviceConfig.RestrictSUIDSGID = true;
+-        serviceConfig.SystemCallArchitectures = "native";
+-        serviceConfig.UMask = "0077";
+-      } serviceOpts ]);
+-  };
+ in
+ {
+ 
+diff --git a/nixos/modules/services/monitoring/prometheus/mk-exporter.nix b/nixos/modules/services/monitoring/prometheus/mk-exporter.nix
+new file mode 100644
+index 000000000000..0e4efce62813
+--- /dev/null
++++ b/nixos/modules/services/monitoring/prometheus/mk-exporter.nix
+@@ -0,0 +1,165 @@
++lib:
++
++let
++  inherit (lib) concatStrings foldl foldl' genAttrs literalExpression maintainers
++    mapAttrs mapAttrsToList mkDefault mkEnableOption mkIf mkMerge mkOption
++    optional types mkOptionDefault flip attrNames;
++
++  # each attribute in `exporterOpts` is expected to have specified:
++  #   - port        (types.int):   port on which the exporter listens
++  #   - serviceOpts (types.attrs): config that is merged with the
++  #                                default definition of the exporter's
++  #                                systemd service
++  #   - extraOpts   (types.attrs): extra configuration options to
++  #                                configure the exporter with, which
++  #                                are appended to the default options
++  #
++  #  Note that `extraOpts` is optional, but a script for the exporter's
++  #  systemd service must be provided by specifying either
++  #  `serviceOpts.script` or `serviceOpts.serviceConfig.ExecStart`
++
++  mkExporterOpts = ({ name, port }: {
++    enable = mkEnableOption (lib.mdDoc "the prometheus ${name} exporter");
++    port = mkOption {
++      type = types.port;
++      default = port;
++      description = lib.mdDoc ''
++        Port to listen on.
++      '';
++    };
++    listenAddress = mkOption {
++      type = types.str;
++      default = "0.0.0.0";
++      description = lib.mdDoc ''
++        Address to listen on.
++      '';
++    };
++    extraFlags = mkOption {
++      type = types.listOf types.str;
++      default = [];
++      description = lib.mdDoc ''
++        Extra commandline options to pass to the ${name} exporter.
++      '';
++    };
++    openFirewall = mkOption {
++      type = types.bool;
++      default = false;
++      description = lib.mdDoc ''
++        Open port in firewall for incoming connections.
++      '';
++    };
++    firewallFilter = mkOption {
++      type = types.nullOr types.str;
++      default = null;
++      example = literalExpression ''
++        "-i eth0 -p tcp -m tcp --dport ${toString port}"
++      '';
++      description = lib.mdDoc ''
++        Specify a filter for iptables to use when
++        {option}`services.prometheus.exporters.${name}.openFirewall`
++        is true. It is used as `ip46tables -I nixos-fw firewallFilter -j nixos-fw-accept`.
++      '';
++    };
++    user = mkOption {
++      type = types.str;
++      default = "${name}-exporter";
++      description = lib.mdDoc ''
++        User name under which the ${name} exporter shall be run.
++      '';
++    };
++    group = mkOption {
++      type = types.str;
++      default = "${name}-exporter";
++      description = lib.mdDoc ''
++        Group under which the ${name} exporter shall be run.
++      '';
++    };
++  });
++
++  mkSubModule = { name, port, extraOpts, imports }: {
++    ${name} = mkOption {
++      type = types.submodule [{
++        inherit imports;
++        options = (mkExporterOpts {
++          inherit name port;
++        } // extraOpts);
++      } ({ config, ... }: mkIf config.openFirewall {
++        firewallFilter = mkDefault "-p tcp -m tcp --dport ${toString config.port}";
++      })];
++      internal = true;
++      default = {};
++    };
++  };
++
++  mkExporterConf = { name, conf, serviceOpts }:
++    let
++      enableDynamicUser = serviceOpts.serviceConfig.DynamicUser or true;
++    in
++    mkIf conf.enable {
++      warnings = conf.warnings or [];
++      users.users."${name}-exporter" = (mkIf (conf.user == "${name}-exporter" && !enableDynamicUser) {
++        description = "Prometheus ${name} exporter service user";
++        isSystemUser = true;
++        inherit (conf) group;
++      });
++      users.groups = (mkIf (conf.group == "${name}-exporter" && !enableDynamicUser) {
++        "${name}-exporter" = {};
++      });
++      networking.firewall.extraCommands = mkIf conf.openFirewall (concatStrings [
++        "ip46tables -A nixos-fw ${conf.firewallFilter} "
++        "-m comment --comment ${name}-exporter -j nixos-fw-accept"
++      ]);
++      systemd.services."prometheus-${name}-exporter" = mkMerge ([{
++        wantedBy = [ "multi-user.target" ];
++        after = [ "network.target" ];
++        serviceConfig.Restart = mkDefault "always";
++        serviceConfig.PrivateTmp = mkDefault true;
++        serviceConfig.WorkingDirectory = mkDefault /tmp;
++        serviceConfig.DynamicUser = mkDefault enableDynamicUser;
++        serviceConfig.User = mkDefault conf.user;
++        serviceConfig.Group = conf.group;
++        # Hardening
++        serviceConfig.CapabilityBoundingSet = mkDefault [ "" ];
++        serviceConfig.DeviceAllow = [ "" ];
++        serviceConfig.LockPersonality = true;
++        serviceConfig.MemoryDenyWriteExecute = true;
++        serviceConfig.NoNewPrivileges = true;
++        serviceConfig.PrivateDevices = mkDefault true;
++        serviceConfig.ProtectClock = mkDefault true;
++        serviceConfig.ProtectControlGroups = true;
++        serviceConfig.ProtectHome = true;
++        serviceConfig.ProtectHostname = true;
++        serviceConfig.ProtectKernelLogs = true;
++        serviceConfig.ProtectKernelModules = true;
++        serviceConfig.ProtectKernelTunables = true;
++        serviceConfig.ProtectSystem = mkDefault "strict";
++        serviceConfig.RemoveIPC = true;
++        serviceConfig.RestrictAddressFamilies = [ "AF_INET" "AF_INET6" ];
++        serviceConfig.RestrictNamespaces = true;
++        serviceConfig.RestrictRealtime = true;
++        serviceConfig.RestrictSUIDSGID = true;
++        serviceConfig.SystemCallArchitectures = "native";
++        serviceConfig.UMask = "0077";
++      } serviceOpts ]);
++  };
++
++  mkDownstreamOptions = name: opts:
++    mkSubModule {
++      inherit name;
++      inherit (opts) port;
++      extraOpts = opts.extraOpts or {};
++      imports = opts.imports or [];
++    };
++
++  mkDownstreamConfig = name: opts: cfg:
++    mkExporterConf {
++      inherit name;
++      inherit (opts) serviceOpts;
++      conf = cfg;
++    };
++in
++{
++  inherit
++    mkExporterConf mkSubModule
++    mkDownstreamOptions mkDownstreamConfig;
++}
+-- 
+2.43.2
+
