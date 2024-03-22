@@ -1,0 +1,39 @@
+type Config struct {
+	Listen   string `json:"listen"`
+	CertFile struct {
+		Enable bool `json:"enable"`
+    Globs         []string `json:"globs"`
+  	ExcludeSystem bool     `json:"exclude_system"`
+	} `json:"certfile"`
+	MCELog struct {
+		Enable bool `json:"enable"`
+    Path string `json:"path"`
+	} `json:"mcelog"`
+	PTHeartbeat struct {
+		Enable bool `json:"enable"`
+    Database     string `json:"database"`
+  	Table        string `json:"table"`
+  	DefaultsFile string `json:"defaultsFile"`
+  	MasterID     int    `json:"masterId"`
+	} `json:"ptheartbeat"`
+	FsTab struct {
+		Enable bool `json:"enable"`
+	} `json:"fstab"`
+	BinLog struct {
+		Enable bool `json:"enable"`
+    Path string `json:"path"`
+	} `json:"binlog"`
+	RasDaemon struct {
+		Enable bool `json:"enable"`
+    Path string `json:"path"`
+	} `json:"rasdaemon"`
+	Elk struct {
+		Enable bool `json:"enable"`
+    Duration string `json:"duration"`
+  	Node     string `json:"node"`
+	} `json:"elk"`
+	Exec struct {
+		Enable bool `json:"enable"`
+    Scripts map[string]CmdOptions `json:"scripts"`
+	} `json:"exec"`
+}
