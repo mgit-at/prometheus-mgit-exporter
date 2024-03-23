@@ -16,5 +16,6 @@ buildGoModule rec {
     homepage = "https://github.com/mgit-at/prometheus-mgit-exporter";
     license = licenses.apsl20;
     maintainers = with maintainers; [ mkg20001 ];
+    mainProgram = "prometheus-mgit-exporter";
   };
 }

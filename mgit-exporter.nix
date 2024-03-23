@@ -1,5 +1,5 @@
 # nixpkgs/nixos/modules/services/prometheus/exporters/mgit.nix
-{ config, lib, pkgs, options, ... }:
+{ config, lib, pkgs, options, utils, ... }:
 
 with lib;
 
@@ -16,31 +16,6 @@ in
   # (and optional overrides for default options).
   # Note that this attribute is optional.
   extraOpts = {
-    /* telemetryPath = mkOption {
-      type = types.str;
-      default = "/metrics";
-      description = ''
-        Path under which to expose metrics.
-      '';
-    };
-    logfilePath = mkOption {
-      type = types.path;
-      default = /var/log/mgit_exporter_input.log;
-      example = /var/log/mail.log;
-      description = ''
-        Path where mgit writes log entries.
-        This file will be truncated by this exporter!
-      '';
-    };
-    showqPath = mkOption {
-      type = types.path;
-      default = /var/spool/mgit/public/showq;
-      example = /var/lib/mgit/queue/public/showq;
-      description = ''
-        Path at which mgit places its showq socket.
-      '';
-    }; */
-
     listen = mkOption {
       default = ":${toString cfg.port}";
       type = types.str;
@@ -175,9 +150,10 @@ in
       Restart = "on-failure";
       RestartSec = 1;
       DynamicUser = false;
-      ExecStart = ''
-        ${pkgs.prometheus-mgit-exporter}/bin/mgit_exporter -config ${configurationFile}
-      '';
+      ExecStart = utils.escapeSystemdExecArgs [
+        (getExe pkgs.prometheus-mgit-exporter)
+        "-config" (toString configurationFile)
+      ];
     };
   };
 }
