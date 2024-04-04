@@ -1,5 +1,9 @@
+load("@gazelle//:def.bzl", "gazelle")
 load("@rules_go//go:def.bzl", "go_binary", "go_library", "nogo")
 load("@rules_pkg//:pkg.bzl", "pkg_deb", "pkg_tar")
+
+# gazelle:prefix mgit.at/prometheus-mgit-exporter
+gazelle(name = "gazelle")
 
 go_library(
     name = "prometheus-mgit-exporter_lib",
@@ -72,6 +76,6 @@ pkg_deb(
         "repo:dpkg-bionic",
         "repo:dpkg-xenial",
     ],
-    version = "1.9.3",
+    version = "1.9.4",
     visibility = ["//visibility:public"],
 )

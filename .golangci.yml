@@ -10,4 +10,3 @@ linters:
     - depguard
     - gomnd
     - tagliatelle # json(camel)
-  fast: true
