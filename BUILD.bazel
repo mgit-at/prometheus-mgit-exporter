@@ -32,6 +32,7 @@ go_library(
 go_binary(
     name = "prometheus-mgit-exporter",
     embed = [":prometheus-mgit-exporter_lib"],
+    pure = "on",
     visibility = ["//visibility:public"],
 )
 
