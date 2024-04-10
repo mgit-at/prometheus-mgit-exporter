@@ -1,0 +1,32 @@
+linters:
+  enable-all: true
+  disable:
+    - scopelint # deprecated (since v1.39.0)
+    - nosnakecase # deprecated (since v1.48.1)
+    - ifshort # deprecated (since v1.48.0)
+    - wsl # assignments should only be cuddled with other assignments
+    - funlen # Function has too many statements
+    - nlreturn # return with no blank line before
+    - depguard
+    - gomnd
+    - tagliatelle # json(camel)
+    - deadcode # deprecated (since v1.49.0)
+    - exhaustivestruct # deprecated (since v1.46.0)
+    - golint # deprecated (since v1.41.0)
+    - ifshort # deprecated (since v1.48.0)
+    - interfacer # deprecated (since v1.38.0)
+    - maligned # deprecated (since v1.38.0)
+    - nosnakecase # deprecated (since v1.48.1)
+    - scopelint # deprecated (since v1.39.0)
+    - structcheck # deprecated (since v1.49.0)
+    - varcheck # deprecated (since v1.49.0)
+    - cyclop
+    - errorlint
+    - exhaustruct
+    - goerr113
+    - musttag
+    - varnamelen
+    - perfsprint
+    - wrapcheck
+    - contextcheck
+    - gosec

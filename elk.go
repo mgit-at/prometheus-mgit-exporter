@@ -62,11 +62,10 @@ func (c *ElkChecker) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (c *ElkChecker) collectBadIndices() (int, error) {
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequest("GET", "http://127.0.0.1:9200/_cat/shards?format=json", nil)
+	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:9200/_cat/shards?format=json", nil)
 	if err != nil {
 		return 0, errors.Wrap(err, "failed to create request")
 	}
@@ -105,6 +104,7 @@ func (c *ElkChecker) countBadIndices(shards []shard) (int, error) {
 			counter++
 		}
 	}
+
 	return counter, nil
 }
 
