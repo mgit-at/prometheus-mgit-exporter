@@ -36,11 +36,39 @@ go_binary(
     visibility = ["//visibility:public"],
 )
 
+go_binary(
+    name = "prometheus-mgit-exporter-arm64",
+    embed = [":prometheus-mgit-exporter_lib"],
+    goarch = "arm64",
+    goos = "linux",
+    pure = "on",
+    visibility = ["//visibility:public"],
+)
+
 pkg_tar(
     name = "debian-data",
     extension = "tar.gz",
     files = {
         ":prometheus-mgit-exporter": "/usr/bin/prometheus-mgit-exporter",
+        ":config.json": "/etc/prometheus-mgit-exporter/config.json",
+        ":prometheus-mgit-exporter.service": "/lib/systemd/system/prometheus-mgit-exporter.service",
+        ":README.md": "/usr/share/doc/prometheus-mgit-exporter/README.md",
+        ":LICENSE": "/usr/share/doc/prometheus-mgit-exporter/LICENSE",
+    },
+    modes = {
+        "/usr/bin/prometheus-mgit-exporter": "0755",
+        "/etc/prometheus-mgit-exporter/config.json": "0644",
+        "/lib/systemd/system/prometheus-mgit-exporter.service": "0644",
+        "/usr/share/doc/prometheus-mgit-exporter/README.md": "0644",
+        "/usr/share/doc/prometheus-mgit-exporter/LICENSE": "0644",
+    },
+)
+
+pkg_tar(
+    name = "debian-data-arm64",
+    extension = "tar.gz",
+    files = {
+        ":prometheus-mgit-exporter-arm64": "/usr/bin/prometheus-mgit-exporter",
         ":config.json": "/etc/prometheus-mgit-exporter/config.json",
         ":prometheus-mgit-exporter.service": "/lib/systemd/system/prometheus-mgit-exporter.service",
         ":README.md": "/usr/share/doc/prometheus-mgit-exporter/README.md",
@@ -76,6 +104,27 @@ pkg_deb(
         "repo:dpkg-focal",
         "repo:dpkg-bionic",
         "repo:dpkg-xenial",
+    ],
+    version = "1.9.4",
+    visibility = ["//visibility:public"],
+)
+
+pkg_deb(
+    name = "debian-arm64",
+    architecture = "arm64",
+    built_using = "bazel",
+    conffiles = [
+        "/etc/prometheus-mgit-exporter/config.json\n",
+    ],
+    data = ":debian-data-arm64",
+    description = "A collection of useful monitoring for Prometheus by mgIT GmbH.",
+    homepage = "https://mgit.at/",
+    maintainer = "Jonas Reindl <jreindl@mgit.at>",
+    package = "prometheus-mgit-exporter",
+    tags = [
+        "repo:dpkg-bookworm",
+        "repo:dpkg-bullseye",
+        "repo:dpkg-buster",
     ],
     version = "1.9.4",
     visibility = ["//visibility:public"],
