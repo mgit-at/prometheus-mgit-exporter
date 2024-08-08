@@ -99,7 +99,6 @@ func (c *RasdaemonChecker) CollectRasdaemonSize(ch chan<- prometheus.Metric) {
 	if err := rows.Err(); err != nil {
 		log.Println("sql.Next:", err)
 	}
-
 }
 
 func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Metric) {
@@ -123,6 +122,7 @@ func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Me
 		// Trim unnecessary mentioning of bank in bank_name - example: bank = 18, bank_name = Unified Memory Controller (bank=18)
 		bankName = strings.TrimSuffix(bankName, fmt.Sprintf(" (bank=%d)", bank))
 
+		//nolint:godox
 		// Todo: This could break when rasdaemon is updated.
 		// See: https://github.com/mchehab/rasdaemon/blob/v0.6.6/mce-amd.c
 		if strings.HasSuffix(errorMsg, " no action required.") {
