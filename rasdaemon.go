@@ -24,7 +24,6 @@ type RasdaemonChecker struct {
 	opts RasDaemonOptions
 	db   *sql.DB
 
-	promRasdaemonSize          *prometheus.Desc
 	promRasdaemonMCERecordSize *prometheus.Desc
 	promRasdaemonMCEventSize   *prometheus.Desc
 }
@@ -50,10 +49,6 @@ func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 	return &RasdaemonChecker{
 		opts: opts,
 		db:   db,
-		promRasdaemonSize: prometheus.NewDesc(
-			"rasdaemon_entries_total",
-			"(deprecated) size of the rasdaemon mc-event log",
-			[]string{"bank", "bank_name"}, nil),
 		promRasdaemonMCERecordSize: prometheus.NewDesc(
 			"rasdaemon_mce_record_total",
 			"size of the rasdaemon mce_records",
@@ -61,44 +56,13 @@ func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 		promRasdaemonMCEventSize: prometheus.NewDesc(
 			"rasdaemon_mc_event_total",
 			"size of the rasdaemon mc-event log events",
-			[]string{"err_type"}, nil),
+			[]string{"err_type", "action_required"}, nil),
 	}, nil
 }
 
 func (c *RasdaemonChecker) Describe(ch chan<- *prometheus.Desc) {
-	ch <- c.promRasdaemonSize
 	ch <- c.promRasdaemonMCERecordSize
 	ch <- c.promRasdaemonMCEventSize
-}
-
-func (c *RasdaemonChecker) CollectRasdaemonSize(ch chan<- prometheus.Metric) {
-	rows, err := c.db.Query("select bank, bank_name, count(id) from mce_record group by bank, bank_name")
-	if err != nil {
-		log.Println("failed to query mce_record:", err)
-		return
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var size int
-		var bank int
-		var bankName string
-
-		if err := rows.Scan(&bank, &bankName, &size); err != nil {
-			log.Println("sql.Scan:", err)
-			continue
-		}
-
-		ch <- prometheus.MustNewConstMetric(
-			c.promRasdaemonSize,
-			prometheus.GaugeValue,
-			float64(size),
-			strconv.Itoa(bank),
-			bankName,
-		)
-	}
-	if err := rows.Err(); err != nil {
-		log.Println("sql.Next:", err)
-	}
 }
 
 func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Metric) {
@@ -124,7 +88,7 @@ func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Me
 
 		//nolint:godox
 		// Todo: This could break when rasdaemon is updated.
-		// See: https://github.com/mchehab/rasdaemon/blob/v0.6.6/mce-amd.c
+		// See: https://pagure.io/rasdaemon/blob/master/f/mce-amd.c
 		if strings.HasSuffix(errorMsg, " no action required.") {
 			ch <- prometheus.MustNewConstMetric(
 				c.promRasdaemonMCERecordSize,
@@ -153,7 +117,7 @@ func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Me
 
 func (c *RasdaemonChecker) CollectRasdaemonMCEventSize(ch chan<- prometheus.Metric) {
 	// There are exactly 4 error types in mc_events: Corrected, Uncorrected, Fatal and Info.
-	// See: https://github.com/mchehab/rasdaemon/blob/v0.6.6/ras-mc-handler.c
+	// See: https://pagure.io/rasdaemon/blob/master/f/ras-mc-handler.c
 	rows, err := c.db.Query("select err_type, count(id) from mc_event group by err_type")
 	if err != nil {
 		log.Println("failed to query mc_event:", err)
@@ -169,11 +133,24 @@ func (c *RasdaemonChecker) CollectRasdaemonMCEventSize(ch chan<- prometheus.Metr
 			continue
 		}
 
+		//nolint:godox
+		// Todo: This could break when rasdaemon is updated.
+		if errType == "Corrected" || errType == "Info" {
+			ch <- prometheus.MustNewConstMetric(
+				c.promRasdaemonMCEventSize,
+				prometheus.GaugeValue,
+				float64(size),
+				errType,
+				"no",
+			)
+			continue
+		}
 		ch <- prometheus.MustNewConstMetric(
 			c.promRasdaemonMCEventSize,
 			prometheus.GaugeValue,
 			float64(size),
 			errType,
+			"yes",
 		)
 	}
 	if err := rows.Err(); err != nil {
@@ -182,7 +159,6 @@ func (c *RasdaemonChecker) CollectRasdaemonMCEventSize(ch chan<- prometheus.Metr
 }
 
 func (c *RasdaemonChecker) Collect(ch chan<- prometheus.Metric) {
-	c.CollectRasdaemonSize(ch)
 	c.CollectRasdaemonMCERecordSize(ch)
 	c.CollectRasdaemonMCEventSize(ch)
 }
