@@ -56,7 +56,7 @@ func NewRasdaemonChecker(opts RasDaemonOptions) (*RasdaemonChecker, error) {
 		promRasdaemonMCEventSize: prometheus.NewDesc(
 			"rasdaemon_mc_event_total",
 			"size of the rasdaemon mc-event log events",
-			[]string{"err_type", "action_required"}, nil),
+			[]string{"err_type"}, nil),
 	}, nil
 }
 
@@ -133,24 +133,11 @@ func (c *RasdaemonChecker) CollectRasdaemonMCEventSize(ch chan<- prometheus.Metr
 			continue
 		}
 
-		//nolint:godox
-		// Todo: This could break when rasdaemon is updated.
-		if errType == "Corrected" || errType == "Info" {
-			ch <- prometheus.MustNewConstMetric(
-				c.promRasdaemonMCEventSize,
-				prometheus.GaugeValue,
-				float64(size),
-				errType,
-				"no",
-			)
-			continue
-		}
 		ch <- prometheus.MustNewConstMetric(
 			c.promRasdaemonMCEventSize,
 			prometheus.GaugeValue,
 			float64(size),
 			errType,
-			"yes",
 		)
 	}
 	if err := rows.Err(); err != nil {
