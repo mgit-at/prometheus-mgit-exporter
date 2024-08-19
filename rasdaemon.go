@@ -66,7 +66,13 @@ func (c *RasdaemonChecker) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Metric) {
-	rows, err := c.db.Query("select bank, bank_name, error_msg, count(id) from mce_record group by bank, bank_name, error_msg")
+	//nolint:godox
+	// Todo: This could break when rasdaemon is updated.
+	// See: https://pagure.io/rasdaemon/blob/master/f/mce-amd.c
+	rows, err := c.db.Query(`
+		select bank, bank_name, (case when error_msg like '% no action required.' then 'no' else 'yes' end) as action_required, count(id)
+		from mce_record group by bank, bank_name, action_required;
+	`)
 	if err != nil {
 		log.Println("failed to query mce_record:", err)
 		return
@@ -76,38 +82,22 @@ func (c *RasdaemonChecker) CollectRasdaemonMCERecordSize(ch chan<- prometheus.Me
 		var size int
 		var bank int
 		var bankName string
-		var errorMsg string
+		var actionRequired string
 
-		if err := rows.Scan(&bank, &bankName, &errorMsg, &size); err != nil {
+		if err := rows.Scan(&bank, &bankName, &actionRequired, &size); err != nil {
 			log.Println("sql.Scan:", err)
 			continue
 		}
 
 		// Trim unnecessary mentioning of bank in bank_name - example: bank = 18, bank_name = Unified Memory Controller (bank=18)
 		bankName = strings.TrimSuffix(bankName, fmt.Sprintf(" (bank=%d)", bank))
-
-		//nolint:godox
-		// Todo: This could break when rasdaemon is updated.
-		// See: https://pagure.io/rasdaemon/blob/master/f/mce-amd.c
-		if strings.HasSuffix(errorMsg, " no action required.") {
-			ch <- prometheus.MustNewConstMetric(
-				c.promRasdaemonMCERecordSize,
-				prometheus.GaugeValue,
-				float64(size),
-				strconv.Itoa(bank),
-				bankName,
-				"no",
-			)
-			continue
-		}
-
 		ch <- prometheus.MustNewConstMetric(
 			c.promRasdaemonMCERecordSize,
 			prometheus.GaugeValue,
 			float64(size),
 			strconv.Itoa(bank),
 			bankName,
-			"yes",
+			actionRequired,
 		)
 	}
 	if err := rows.Err(); err != nil {
