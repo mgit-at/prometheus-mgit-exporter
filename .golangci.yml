@@ -30,3 +30,4 @@ linters:
     - wrapcheck
     - contextcheck
     - gosec
+    - lll
