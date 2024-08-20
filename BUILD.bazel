@@ -126,6 +126,6 @@ pkg_deb(
         "repo:dpkg-bullseye",
         "repo:dpkg-buster",
     ],
-    version = "1.9.4",
+    version = "1.10.0",
     visibility = ["//visibility:public"],
 )
