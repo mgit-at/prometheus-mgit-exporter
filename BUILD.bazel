@@ -104,6 +104,7 @@ pkg_deb(
         "repo:dpkg-focal",
         "repo:dpkg-bionic",
         "repo:dpkg-xenial",
+        "repo:dpkg-noble",
     ],
     version = "1.10.0",
     visibility = ["//visibility:public"],
