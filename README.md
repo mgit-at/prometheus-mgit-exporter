@@ -86,6 +86,13 @@ Runs your own executables (e.g collecting additional information, restarting a s
       - ``dir`` (string): directory where the executable will be run (default: current working directory)
       - ``timeout`` (string): timeout for your scripts (default: ``5s``)
 
+### **crypt** ###
+
+Reports if there exist static disk encryption keys, manual input is required for encryption and the luks key slots that are in use.
+
+**Parameters:**
+  - ``enable`` (bool): activate or deactivate this check
+
 Configuration
 -------------
 

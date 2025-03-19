@@ -52,6 +52,10 @@ type Config struct {
 		Enable bool `json:"enable"`
 		ExecOptions
 	} `json:"exec"`
+	Crypt struct {
+		Enable bool `json:"enable"`
+		CryptOptions
+	} `json:"crypt"`
 }
 
 func run() error {
@@ -130,6 +134,14 @@ func run() error {
 		c := NewElkChecker(cfg.Elk.ElkOptions)
 		if err := prometheus.Register(c); err != nil {
 			return fmt.Errorf("failed to register elk checker: %v", err)
+		}
+	}
+
+	if cfg.Crypt.Enable {
+		log.Println("enabling crypt checker")
+		c := NewCryptChecker(cfg.Crypt.CryptOptions)
+		if err := prometheus.Register(c); err != nil {
+			return fmt.Errorf("failed to register crypt checker: %v", err)
 		}
 	}
 
