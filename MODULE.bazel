@@ -10,6 +10,14 @@ bazel_dep(name = "gazelle", version = "0.36.0")
 # All *direct* Go dependencies of the module have to be listed explicitly.
 # ------------------------------------------------------------------------------
 
+go_sdk_dev = use_extension("@rules_go//go:extensions.bzl", "go_sdk", dev_dependency = True)
+go_sdk_dev.download(version = "1.24.1")
+
+use_repo(
+    go_sdk_dev,
+    go_sdk = "go_default_sdk",
+)
+
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")
 use_repo(
