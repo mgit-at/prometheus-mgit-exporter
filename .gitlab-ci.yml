@@ -6,7 +6,7 @@ stages:
   - add
 
 variables:
-  GOLANGCI_LINT_VERSION: 'v1.57.2'
+  GOLANGCI_LINT_VERSION: 'v1.64.8-alpine'
 
 lint:
   image: golangci/golangci-lint:$GOLANGCI_LINT_VERSION
@@ -14,7 +14,7 @@ lint:
   script:
     # Use default .golangci.yml file from the image if one is not present in the project root.
     - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
-    - golangci-lint run
+    - golangci-lint run -v --config .golangci.yml
 
 build:
   stage: build

@@ -2,18 +2,27 @@ module(
     repo_name = "at_mgit_prometheus_mgit_exporter",
 )
 
-bazel_dep(name = "rules_pkg", version = "0.10.1")
-bazel_dep(name = "rules_go", version = "0.46.0")
-bazel_dep(name = "gazelle", version = "0.36.0")
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "rules_go", version = "0.53.0")
+bazel_dep(name = "gazelle", version = "0.42.0")
 
 # ------------------------------------------------------------------------------
 # All *direct* Go dependencies of the module have to be listed explicitly.
 # ------------------------------------------------------------------------------
 
+go_sdk_dev = use_extension("@rules_go//go:extensions.bzl", "go_sdk", dev_dependency = True)
+go_sdk_dev.download(version = "1.24.1")
+
+use_repo(
+    go_sdk_dev,
+    go_sdk = "go_default_sdk",
+)
+
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 go_deps.from_file(go_mod = "//:go.mod")
 use_repo(
     go_deps,
+    "com_github_anatol_luks_go",
     "com_github_mattn_go_zglob",
     "com_github_pkg_errors",
     "com_github_prometheus_client_golang",
