@@ -108,7 +108,7 @@ pkg_deb(
         "repo:dpkg-stretch",
         "repo:dpkg-xenial",
     ],
-    version = "1.11.0",
+    version = "1.11.1",
     visibility = ["//visibility:public"],
 )
 
@@ -129,6 +129,6 @@ pkg_deb(
         "repo:dpkg-bullseye",
         "repo:dpkg-buster",
     ],
-    version = "1.11.0",
+    version = "1.11.1",
     visibility = ["//visibility:public"],
 )
