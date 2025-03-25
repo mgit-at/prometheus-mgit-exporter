@@ -50,7 +50,7 @@ func NewCryptChecker(opts CryptOptions) *CryptChecker {
 			nil),
 		promCryptStaticKeyFile: prometheus.NewDesc(
 			"mgit_crypt_key_file_on_non_tmpfs",
-			"Indicates that a encryption key for the specific device is stored on non tmpfs",
+			"Indicates that a encryption key for the specific device is stored on a non tmpfs",
 			[]string{"device"},
 			nil),
 		promCryptKeySlotUsed: prometheus.NewDesc(
