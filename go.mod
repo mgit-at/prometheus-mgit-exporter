@@ -6,7 +6,7 @@ require (
 	github.com/anatol/luks.go v0.0.0-20250316021219-8cd744c3576f
 	github.com/mattn/go-zglob v0.0.6
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.21.1
+	github.com/prometheus/client_golang v1.22.0
 	modernc.org/sqlite v1.37.0
 )
 
