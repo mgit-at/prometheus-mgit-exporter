@@ -26,7 +26,7 @@
         },
         {
             "description": "update bazel modules",
-            "matchFileNames": ["(^|/)MODULE\\.bazel$"],
+            "matchManagers": ["bazel-module"],
             "matchUpdateTypes": ["minor","patch"],
             "automerge": true
         }
