@@ -23,6 +23,12 @@
             "matchManagers": ["gomod"],
             "matchDepTypes": ["indirect"],
             "enabled": true
+        },
+        {
+            "description": "update bazel modules",
+            "matchFileNames": ["(^|/)MODULE\\.bazel$"],
+            "matchUpdateTypes": ["minor","patch"],
+            "automerge": true
         }
     ]
 }
