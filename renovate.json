@@ -22,7 +22,7 @@
             "description": "update indirect dependencies",
             "matchManagers": ["gomod"],
             "matchDepTypes": ["indirect"],
-            "enabled": true
+            "automerge": true
         },
         {
             "description": "update bazel modules",
