@@ -6,6 +6,7 @@
     "ignorePaths": [
         ".gitlab-ci.yml"
     ],
+    "postUpdateOptions": ["gomodTidy"],
     "prHourlyLimit": 2,
     "lockFileMaintenance": {
         "enabled": true,
