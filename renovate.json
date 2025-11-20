@@ -6,7 +6,9 @@
     "ignorePaths": [
         ".gitlab-ci.yml"
     ],
+    "postUpdateOptions": ["gomodTidy"],
     "prHourlyLimit": 2,
+    "prConcurrentLimit": 2,
     "lockFileMaintenance": {
         "enabled": true,
         "automerge": true
@@ -22,6 +24,8 @@
             "description": "update indirect dependencies",
             "matchManagers": ["gomod"],
             "matchDepTypes": ["indirect"],
+            "matchUpdateTypes": ["minor","patch"],
+            "matchCurrentVersion": "!/^0/",
             "enabled": true,
             "automerge": true
         },
