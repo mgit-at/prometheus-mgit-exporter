@@ -8,6 +8,7 @@
     ],
     "postUpdateOptions": ["gomodTidy"],
     "prHourlyLimit": 2,
+    "prConcurrentLimit": 2,
     "lockFileMaintenance": {
         "enabled": true,
         "automerge": true
