@@ -24,6 +24,8 @@
             "description": "update indirect dependencies",
             "matchManagers": ["gomod"],
             "matchDepTypes": ["indirect"],
+            "matchUpdateTypes": ["minor","patch"],
+            "matchCurrentVersion": "!/^0/",
             "enabled": true,
             "automerge": true
         },
