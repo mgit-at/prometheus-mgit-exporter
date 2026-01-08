@@ -7,7 +7,7 @@ require (
 	github.com/mattn/go-zglob v0.0.6
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.23.2
-	modernc.org/sqlite v1.42.2
+	modernc.org/sqlite v1.43.0
 )
 
 require (
