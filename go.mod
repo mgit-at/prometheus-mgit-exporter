@@ -7,7 +7,7 @@ require (
 	github.com/mattn/go-zglob v0.0.6
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.23.2
-	modernc.org/sqlite v1.43.0
+	modernc.org/sqlite v1.44.0
 )
 
 require (
@@ -32,7 +32,7 @@ require (
 	golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
-	modernc.org/libc v1.67.0 // indirect
+	modernc.org/libc v1.67.4 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
