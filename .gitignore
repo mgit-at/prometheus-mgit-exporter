@@ -4,3 +4,4 @@ debian/prometheus-mgit-exporter.debhelper.log
 debian/prometheus-mgit-exporter.substvars
 debian/prometheus-mgit-exporter/
 prometheus-mgit-exporter
+result*
