@@ -90,7 +90,7 @@ pkg_deb(
     architecture = "amd64",
     built_using = "bazel",
     conffiles = [
-        "/etc/prometheus-mgit-exporter/config.json\n",
+        "/etc/prometheus-mgit-exporter/config.json",
     ],
     data = ":debian-data",
     description = "A collection of useful monitoring for Prometheus by mgIT GmbH.",
@@ -117,7 +117,7 @@ pkg_deb(
     architecture = "arm64",
     built_using = "bazel",
     conffiles = [
-        "/etc/prometheus-mgit-exporter/config.json\n",
+        "/etc/prometheus-mgit-exporter/config.json",
     ],
     data = ":debian-data-arm64",
     description = "A collection of useful monitoring for Prometheus by mgIT GmbH.",
