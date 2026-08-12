@@ -1,23 +1,52 @@
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
     - contextcheck
     - cyclop
     - depguard
+    - embeddedstructfieldcheck
     - err113
     - errorlint
     - exhaustruct
-    - funlen # Function has too many statements
+    - funlen
+    - goconst
     - gocognit
     - gosec
     - lll
-    - mnd # Exclude since the are used for e.g. context timeouts, buffer size, filemodes,...
+    - mnd
+    - modernize
     - musttag
     - nestif
-    - nlreturn # return with no blank line before
+    - nlreturn
+    - noctx
+    - noinlineerr
     - perfsprint
-    - tagliatelle # json(camel)
-    - tenv # deprecated (since 1.64.0)
+    - tagliatelle
     - varnamelen
     - wrapcheck
-    - wsl # assignments should only be cuddled with other assignments
+    - wsl
+    - wsl_v5
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
