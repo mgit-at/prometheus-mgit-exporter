@@ -1,6 +1,6 @@
 module github.com/mgit-at/prometheus-mgit-exporter
 
-go 1.26.5
+go 1.26.6
 
 require (
 	github.com/anatol/luks.go v0.0.0-20260615185044-2658459c8ca5
