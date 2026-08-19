@@ -2,6 +2,7 @@
 stages:
   - linter
   - build
+  - scan
   - upload
   - add
 
@@ -20,6 +21,27 @@ build:
   stage: build
   script:
     - bazel build --keep_going //...
+  tags:
+    - k8s-mgit-bazel
+
+vulnerability_scan:
+  stage: scan
+  script:
+    # 1. Run Go vulnerability check
+    - bazel run @rules_go//go -- run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+    # 2. Generate CycloneDX v1.6 SBOM using Syft
+    - bazel run @rules_go//go -- run github.com/anchore/syft/cmd/syft@latest dir:. -o cyclonedx-json@1.6=sbom.json
+
+    # 3. Scan the generated SBOM with Grype
+    - bazel run @rules_go//go -- run github.com/anchore/grype/cmd/grype@latest sbom:sbom.json --config .grype.yaml
+  artifacts:
+    name: "sbom-$CI_COMMIT_REF_NAME"
+    paths:
+      - sbom.json
+    expire_in: 30 days
+    when: always
+  allow_failure: true
   tags:
     - k8s-mgit-bazel
 
