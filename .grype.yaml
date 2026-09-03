@@ -1,0 +1,9 @@
+# Set fail-on threshold (fails pipeline on any vulnerability >= negligible)
+fail-on-severity: "negligible"
+
+# Ignored vulnerabilities
+ignore:
+  - vulnerability: "GO-2026-5932"
+    package:
+      name: "golang.org/x/crypto"
+    reason: "Not affected"
