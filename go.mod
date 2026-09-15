@@ -4,7 +4,7 @@ go 1.26.6
 
 require (
 	github.com/anatol/luks.go v0.0.0-20260615185044-2658459c8ca5
-	github.com/mattn/go-zglob v0.0.6
+	github.com/mattn/go-zglob v0.0.7
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.24.1
 	modernc.org/sqlite v1.58.0
