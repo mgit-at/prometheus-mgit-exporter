@@ -13,6 +13,8 @@ repos:
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/jammy/Release"
   - name: dpkg-stretch
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/stretch/Release"
+  - name: dpkg-trixie
+    url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/trixie/Release"
   - name: dpkg-xenial
     url: "https://ci:${APT_PASSWORD_CI}@pkg.mgit.at/dpkg/dists/xenial/Release"
   - name: dpkg-noble
