@@ -47,7 +47,6 @@ vulnerability_scan:
   allow_failure: true
   tags:
     - k8s-mgit-bazel
-
 upload:
   stage: upload
   script:
@@ -88,11 +87,6 @@ sbom:
     expire_in: 30 days
     reports:
       dotenv: sbom/upload.env
-  rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-    - if: '$CI_COMMIT_BRANCH'
-      when: manual
-      allow_failure: true
   tags:
     - k8s-mgit-bazel
 
