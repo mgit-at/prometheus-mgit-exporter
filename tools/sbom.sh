@@ -9,7 +9,7 @@ BUILD_FILE="BUILD.bazel"
 CDX_VERSION="${CDX_VERSION:-v1.12.0}"
 
 VERSION="$(sed -n 's/.*version *= *"\([^"]*\)".*/\1/p' "$BUILD_FILE" | head -n1)"
-[[ -n "$VERSION" ]] || { echo "Keine version in $BUILD_FILE gefunden" >&2; exit 1; }
+[[ -n "$VERSION" ]] || { echo "No version found in $BUILD_FILE" >&2; exit 1; }
 
 GOROOT="$(bazel run @rules_go//go -- env GOROOT 2>/dev/null)"
 export PATH="${GOROOT}/bin:${PATH}"
