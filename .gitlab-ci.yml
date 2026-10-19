@@ -2,10 +2,10 @@
 stages:
   - linter
   - build
-  - scan
   - upload
   - add
   - sbom
+  - scan
   - upload-sbom
 
 variables:
@@ -27,26 +27,6 @@ build:
   tags:
     - k8s-mgit-bazel
 
-vulnerability_scan:
-  stage: scan
-  script:
-    # 1. Run Go vulnerability check
-    - bazel run @rules_go//go -- run golang.org/x/vuln/cmd/govulncheck@latest ./...
-
-    # 2. Generate CycloneDX v1.6 SBOM using Syft
-    - bazel run @rules_go//go -- run github.com/anchore/syft/cmd/syft@latest dir:. -o cyclonedx-json@1.6=sbom.json
-
-    # 3. Scan the generated SBOM with Grype
-    - bazel run @rules_go//go -- run github.com/anchore/grype/cmd/grype@latest sbom:sbom.json --config .grype.yaml
-  artifacts:
-    name: "sbom-$CI_COMMIT_REF_NAME"
-    paths:
-      - sbom.json
-    expire_in: 30 days
-    when: always
-  allow_failure: true
-  tags:
-    - k8s-mgit-bazel
 upload:
   stage: upload
   script:
@@ -90,6 +70,30 @@ sbom:
   tags:
     - k8s-mgit-bazel
 
+vulnerability_scan:
+  stage: scan
+  needs: [sbom]
+  variables:
+    GOVULNCHECK_VERSION: v1.9.0
+    GRYPE_VERSION: v0.120.1
+  script:
+    # Go-SDK from rules_go-Toolchain
+    - export PATH="$(bazel run @rules_go//go -- env GOROOT 2>/dev/null)/bin:$PATH"
+    - rc=0
+
+    # 1. Run Go vulnerability check
+    - go run "golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}" ./... || rc=$?
+
+    # 2. Scan the generated SBOM with Grype
+    - GRYPE="go run github.com/anchore/grype/cmd/grype@${GRYPE_VERSION}"
+    - $GRYPE db update
+    - $GRYPE db status
+    - $GRYPE "sbom:sbom/${TOOL}.cdx.json" --config .grype.yaml || rc=$?
+    - exit $rc
+
+  allow_failure: true
+  tags:
+    - k8s-mgit-bazel
 
 upload-sbom:
   stage: upload-sbom
