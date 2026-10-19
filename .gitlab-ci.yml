@@ -76,6 +76,10 @@ vulnerability_scan:
   variables:
     GOVULNCHECK_VERSION: v1.9.0
     GRYPE_VERSION: v0.120.1
+    GRYPE_DB_CACHE_DIR: $CI_PROJECT_DIR/.cache/grype/db
+  cache:
+    - key: grype-db
+      paths: [.cache/grype/db]
   script:
     # Go-SDK from rules_go-Toolchain
     - export PATH="$(bazel run @rules_go//go -- env GOROOT 2>/dev/null)/bin:$PATH"
@@ -85,10 +89,7 @@ vulnerability_scan:
     - go run "golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}" ./... || rc=$?
 
     # 2. Scan the generated SBOM with Grype
-    - GRYPE="go run github.com/anchore/grype/cmd/grype@${GRYPE_VERSION}"
-    - $GRYPE db update
-    - $GRYPE db status
-    - $GRYPE "sbom:sbom/${TOOL}.cdx.json" --config .grype.yaml || rc=$?
+    - go run "github.com/anchore/grype/cmd/grype@${GRYPE_VERSION}" "sbom:sbom/${TOOL}.cdx.json" --config .grype.yaml || rc=$?
     - exit $rc
 
   allow_failure: true
