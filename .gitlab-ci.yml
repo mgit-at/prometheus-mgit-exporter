@@ -5,9 +5,12 @@ stages:
   - scan
   - upload
   - add
+  - sbom
+  - upload-sbom
 
 variables:
   GOLANGCI_LINT_VERSION: 'v2.12.2-alpine'
+  TOOL: prometheus-mgit-exporter
 
 lint:
   image: golangci/golangci-lint:$GOLANGCI_LINT_VERSION
@@ -75,3 +78,56 @@ add:
   tags:
     - mgit
     - pkg
+
+sbom:
+  stage: sbom
+  script:
+    - tools/sbom.sh
+  artifacts:
+    paths: [sbom/]
+    expire_in: 30 days
+    reports:
+      dotenv: sbom/upload.env
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH'
+      when: manual
+      allow_failure: true
+  tags:
+    - k8s-mgit-bazel
+
+
+upload-sbom:
+  stage: upload-sbom
+  image: debian:stable
+  before_script:
+    - apt-get update && apt-get install -y curl
+  needs: [sbom]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - |
+      set -eu
+      up() {
+        echo "Upload ${TOOL} $1 (latest=$2)"
+        curl -v --silent --show-error --fail -X POST "https://deps.mgit.at/api/v1/bom" \
+          -H "X-Api-Key: ${DT_API_KEY}" \
+          -F autoCreate=true -F projectName="$TOOL" -F projectVersion="$1" \
+          -F "parentName=prom-exporter" \
+          -F "parentVersion=master" \
+          -F isLatest="$2" -F bom=@"sbom/${TOOL}.cdx.json"
+      }
+
+      up master false
+
+      code="$(curl -v --silent --show-error --output /dev/null -w '%{http_code}' --get \
+        "https://deps.mgit.at/api/v1/project/lookup" \
+        -H "X-Api-Key: ${DT_API_KEY}" \
+        --data-urlencode "name=${TOOL}" \
+        --data-urlencode "version=${SBOM_RELEASE_VERSION}")"
+
+      case "$code" in
+        404) up "$SBOM_RELEASE_VERSION" true ;;
+        200) echo "Version already exists, no release-upload" ;;
+        *)   echo "DT-Lookup failed (HTTP $code)" >&2; exit 1 ;;
+      esac
