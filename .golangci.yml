@@ -9,9 +9,11 @@ linters:
     - err113
     - errorlint
     - exhaustruct
+    - exhaustruct_v5
     - funlen
     - goconst
     - gocognit
+    - gomodguard
     - gosec
     - lll
     - mnd
