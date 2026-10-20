@@ -9,7 +9,7 @@ stages:
   - upload-sbom
 
 variables:
-  GOLANGCI_LINT_VERSION: 'v2.12.2-alpine'
+  GOLANGCI_LINT_VERSION: 'v2.15.0-alpine'
   TOOL: prometheus-mgit-exporter
 
 lint:

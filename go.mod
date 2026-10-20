@@ -1,6 +1,6 @@
 module github.com/mgit-at/prometheus-mgit-exporter
 
-go 1.26.6
+go 1.27.3
 
 require (
 	github.com/anatol/luks.go v0.0.0-20260615185044-2658459c8ca5
@@ -25,7 +25,7 @@ require (
 	github.com/prometheus/common v0.72.0 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/crypto v0.56.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	modernc.org/libc v1.77.1 // indirect
