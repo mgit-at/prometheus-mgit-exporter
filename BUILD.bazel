@@ -109,7 +109,7 @@ pkg_deb(
         "repo:dpkg-trixie",
         "repo:dpkg-xenial",
     ],
-    version = "1.11.3",
+    version = "1.11.4",
     visibility = ["//visibility:public"],
 )
 
@@ -131,6 +131,6 @@ pkg_deb(
         "repo:dpkg-buster",
         "repo:dpkg-trixie",
     ],
-    version = "1.11.3",
+    version = "1.11.4",
     visibility = ["//visibility:public"],
 )
