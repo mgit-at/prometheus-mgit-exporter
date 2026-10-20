@@ -112,6 +112,7 @@ upload-sbom:
         curl -v --silent --show-error --fail -X POST "https://deps.mgit.at/api/v1/bom" \
           -H "X-Api-Key: ${DT_API_KEY}" \
           -F autoCreate=true -F projectName="$TOOL" -F projectVersion="$1" \
+          -F parentName="prom-exporter" -F parentVersion="all" \
           -F isLatest="$2" -F bom=@"sbom/${TOOL}.cdx.json"
       }
 
