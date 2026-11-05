@@ -1,39 +1,79 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "config:recommended"
+        "config:recommended",
+        "security:gomodIndirectSecurityUpdates"
     ],
+    "osvVulnerabilityAlerts": true,
+    "timezone": "Europe/Vienna",
+    "schedule": ["* 0-6 * * *"],
     "ignorePaths": [
         ".gitlab-ci.yml"
     ],
     "postUpdateOptions": ["gomodTidy"],
     "prHourlyLimit": 2,
     "prConcurrentLimit": 2,
+    "major": {
+        "dependencyDashboardApproval": true
+    },
     "lockFileMaintenance": {
         "enabled": true,
         "automerge": true
     },
     "packageRules": [
         {
-            "description": "automerge minor or patch updates",
-            "matchUpdateTypes": ["minor","patch"],
-            "matchCurrentVersion": "!/^0/",
-            "automerge": true
+            "description": "wait until Go modules are three days old",
+            "matchDatasources": ["go"],
+            "minimumReleaseAge": "3 days"
         },
         {
             "description": "update indirect dependencies",
             "matchManagers": ["gomod"],
             "matchDepTypes": ["indirect"],
-            "matchUpdateTypes": ["minor","patch"],
             "matchCurrentVersion": "!/^0/",
+            "matchUpdateTypes": ["minor", "patch"],
+            "enabled": true
+        },
+        {
+            "description": "auto merge minor and patch releases",
+            "matchUpdateTypes": ["minor", "patch"],
+            "matchCurrentVersion": "!/^v?0\\./",
+            "automerge": true,
+            "autoApprove": true
+        },
+        {
+            "description": "group Go minor and patch releases",
+            "matchManagers": ["gomod"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "matchCurrentVersion": "!/^v?0\\./",
+            "groupName": "go non-major"
+        },
+        {
+            "description": "stable Go modules despite 0.x versions, including indirect ones: group and auto merge them with the other Go releases",
+            "matchPackageNames": [
+                "golang.org/x/tools",
+                "golang.org/x/crypto",
+                "golang.org/x/oauth2",
+                "golang.org/x/sync",
+                "golang.org/x/sys",
+                "golang.org/x/text",
+                "golang.org/x/image",
+                "golang.org/x/mod",
+                "golang.org/x/net",
+                "golang.org/x/time"
+            ],
+            "matchUpdateTypes": ["minor", "patch"],
             "enabled": true,
-            "automerge": true
+            "groupName": "go non-major",
+            "automerge": true,
+            "autoApprove": true
         },
         {
             "description": "update bazel modules",
             "matchManagers": ["bazel-module"],
-            "matchUpdateTypes": ["minor","patch"],
-            "automerge": true
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "autoApprove": true
         }
     ]
 }
