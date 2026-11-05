@@ -1,8 +1,7 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "config:recommended",
-        "security:gomodIndirectSecurityUpdates"
+        "config:recommended"
     ],
     "osvVulnerabilityAlerts": true,
     "timezone": "Europe/Vienna",
